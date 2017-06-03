@@ -1,0 +1,31 @@
+{
+  "name": "koa-web-api",
+  "version": "1.0.0",
+  "description": "Koa MVC",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "mocha --timeout 30000 ./tests/*.js"
+  },
+  "keywords": [],
+  "author": "Adnan Kamili",
+  "license": "ISC",
+  "dependencies": {
+    "config": "^1.26.1",
+    "kcors": "^2.2.1",
+    "koa": "^2.2.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-jwt": "^3.2.2",
+    "koa-logger": "^3.0.0",
+    "koa-router": "^7.2.0",
+    "winston": "^2.3.1",
+    "winston-daily-rotate-file": "^1.4.6"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.0.39",
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "eslint": "^3.19.0",
+    "mocha": "^3.3.0"
+  }
+}

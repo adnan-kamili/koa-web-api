@@ -1,0 +1,19 @@
+{
+    "app": {
+        "port": 4000,
+        "version": "v1"
+    },
+    "datastore": {
+    },
+    "jwt": {
+        "secret": "it is a big secret"
+    },
+    "cors": {
+        "origin": "*",
+        "maxAge": 864000
+    },
+    "logger" : {
+        "console": true,
+        "level": "info"
+    }
+}

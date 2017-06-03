@@ -1,2 +1,2 @@
-# koa-mvc
-Koa MVC Starter Project
+# koa-web-api
+Koa Web Api Boilerplate
