@@ -18,6 +18,8 @@
     "koa-jwt": "^3.2.2",
     "koa-logger": "^3.0.0",
     "koa-router": "^7.2.0",
+    "mysql": "^2.13.0",
+    "sequelize": "^3.30.4",
     "winston": "^2.3.1",
     "winston-daily-rotate-file": "^1.4.6"
   },

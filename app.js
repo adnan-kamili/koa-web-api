@@ -3,6 +3,7 @@
 const Koa = require('koa');
 const config = require('config');
 const Logger = require('./api/services/Logger');
+const db = require('./api/models/database');
 
 // Import middlewares
 const cors = require('kcors');
@@ -31,7 +32,7 @@ app.use(requestLogger());
 app.use(cors(corsConfig));
 
 // JWT middleware for authentication
-//app.use(jwt(jwtConfig));
+// App.use(jwt(jwtConfig));
 
 // Body parser middleware
 app.use(bodyParser({ limit: '1mb' }));
@@ -39,9 +40,19 @@ app.use(bodyParser({ limit: '1mb' }));
 // Router middleware
 app.use(router.routes()).use(router.allowedMethods());
 
-// Start the server
-app.listen(appConfig.port);
-Logger.info("NODE_ENV:", process.env.NODE_ENV);
-Logger.info(`Listening on http://localhost:${appConfig.port}`);
+async function start() {
+    try {
+        // Check the db connection
+        await db.authenticate();
+        await db.sync();
+        // Start the server
+        app.listen(appConfig.port);
+        Logger.info("Environment:", process.env.NODE_ENV);
+        Logger.info(`Listening on http://localhost:${appConfig.port}`);
+    } catch (error) {
+        Logger.error(error.message);
+    }
+}
+start()
 
 module.exports = app;
