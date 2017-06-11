@@ -3,7 +3,7 @@
 const Koa = require('koa');
 const config = require('config');
 const Logger = require('./api/services/Logger');
-const db = require('./api/models/database');
+const { sequelize } = require('./api/models');
 
 // Import middlewares
 const cors = require('kcors');
@@ -14,6 +14,7 @@ const router = require('./config/routes');
 
 // Import custom middlewares
 const errorHandler = require("./api/middlewares/errorHandler");
+const httpResponses = require("./api/middlewares/httpResponses");
 
 // Import configs
 const appConfig = config.get('app');
@@ -37,16 +38,19 @@ app.use(cors(corsConfig));
 // Body parser middleware
 app.use(bodyParser({ limit: '1mb' }));
 
+// Http responses middleware
+app.use(httpResponses());
+
 // Router middleware
 app.use(router.routes()).use(router.allowedMethods());
 
 async function start() {
     try {
         // Check the db connection
-        await db.authenticate();
-        await db.sync();
+        await sequelize.authenticate();
+        await sequelize.sync();
         // Start the server
-        app.listen(appConfig.port);
+        //app.listen(appConfig.port);
         Logger.info("Environment:", process.env.NODE_ENV);
         Logger.info(`Listening on http://localhost:${appConfig.port}`);
     } catch (error) {
@@ -55,4 +59,4 @@ async function start() {
 }
 start()
 
-module.exports = app;
+module.exports = app.listen(appConfig.port);

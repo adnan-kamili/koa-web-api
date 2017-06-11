@@ -4,7 +4,7 @@ const Router = require('koa-router');
 const config = require('config');
 const appConfig = config.get('app');
 
-const router = new Router({ prefix: `/api/${appConfig.version}` });
+const router = new Router({ prefix: `/${appConfig.version}` });
 
 // Import controllers
 const UsersController = require('../api/controllers/UsersController');
