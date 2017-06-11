@@ -2,8 +2,6 @@
 
 const Sequelize = require('sequelize');
 const Logger = require('../services/Logger');
-const BadRequestError = require('../errors/BadRequestError');
-
 
 /**
  *

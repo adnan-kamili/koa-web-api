@@ -8,13 +8,17 @@ const config = require('config');
 const dbConfig = config.get('database');
 const sequelize = new Sequelize(dbConfig.connectionUri, dbConfig);
 
+String.prototype.capitalize = function () {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
 const db = {};
 
 const modelFiles = fs.readdirSync(__dirname).filter((file) => file !== "index.js")
 
 modelFiles.forEach((file) => {
     const model = sequelize.import(path.join(__dirname, file));
-    db[model.name] = model;
+    db[model.name.capitalize()] = model;
 });
 
 Object.keys(db).forEach(function (modelName) {
@@ -22,6 +26,11 @@ Object.keys(db).forEach(function (modelName) {
         db[modelName].associate(db);
     }
 });
+
+// Relationships
+db.User.belongsToMany(db.Role, { through: 'userRoles' });
+db.Role.belongsToMany(db.User, { through: 'userRoles' });
+db.Role.hasMany(db.RoleClaim, { as: 'claims' });
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

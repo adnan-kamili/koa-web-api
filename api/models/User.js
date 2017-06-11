@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const SALT_ROUNDS = 10;
 
 module.exports = function (sequelize, DataTypes) {
-    return sequelize.define('User',
+    const User = sequelize.define('user',
         {
             name: {
                 type: DataTypes.STRING,
@@ -47,4 +47,5 @@ module.exports = function (sequelize, DataTypes) {
                 }
             }
         });
+    return User;
 };
