@@ -48,7 +48,7 @@ async function start() {
     try {
         // Check the db connection
         await sequelize.authenticate();
-        await sequelize.sync();
+        await sequelize.sync({ force: false });
         // Start the server
         //app.listen(appConfig.port);
         Logger.info("Environment:", process.env.NODE_ENV);

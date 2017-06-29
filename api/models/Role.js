@@ -6,7 +6,8 @@ module.exports = function (sequelize, DataTypes) {
             name: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                unique: 'compositeIndex'
+                unique: 'compositeIndex',
+                validate: { notEmpty: { msg: 'name must not be empty' } }
             },
             description: {
                 type: DataTypes.STRING,
@@ -20,8 +21,8 @@ module.exports = function (sequelize, DataTypes) {
         },
         {
             hooks: {
-                beforeValidate: (role) => {
-                    role.name = role.name.toLowerCase();
+                afterValidate: (role) => {
+                    role.name = role.name.toString().toLowerCase();
                 }
             }
         });

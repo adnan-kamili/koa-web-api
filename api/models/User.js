@@ -1,6 +1,6 @@
 'use strict';
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const SALT_ROUNDS = 10;
 
 module.exports = function (sequelize, DataTypes) {
@@ -8,7 +8,8 @@ module.exports = function (sequelize, DataTypes) {
         {
             name: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: false,
+                validate: { notEmpty: { msg: 'name must not be empty' } }
             },
             email: {
                 type: DataTypes.STRING,
@@ -21,7 +22,7 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: false,
                 validate: {
                     len: {
-                        args: [6, 256],
+                        args: [6, 72],
                         msg: 'password must be atleast 6 characters long'
                     }
                 }

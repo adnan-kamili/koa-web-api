@@ -10,7 +10,7 @@ chai.use(chaiHttp);
 
 const baseUrl = '/v1/users';
 let resourceUrl = null;
-const keys = ['id', 'email', 'name', 'lastLogin', 'tenantId', 'createdAt', 'updatedAt'];
+const keys = ['id', 'email', 'name', 'lastLogin', 'tenantId', 'roles', 'createdAt', 'updatedAt'];
 
 describe('Users', () => {
     before((done) => {
@@ -19,7 +19,7 @@ describe('Users', () => {
     describe('/POST user', () => {
         it('it should not POST a user without required fields', (done) => {
             const user = {
-                name: "Adnan Kamili",
+                name: "test user",
                 email: "incorrect email"
             }
             chai.request(app).
@@ -34,9 +34,10 @@ describe('Users', () => {
         });
         it('it should POST a user ', (done) => {
             const user = {
-                name: "Adnan Kamili",
-                email: `adnan.kamili+${Date.now()}@gmail.com`,
-                password: "password1"
+                name: "test user",
+                email: `test.user+${Date.now()}@gmail.com`,
+                password: "password1",
+                roles: []
             }
             chai.request(app).
                 post(baseUrl).
@@ -74,57 +75,29 @@ describe('Users', () => {
                 });
         });
     });
-    describe('/PUT/:id user', () => {
-        it.skip('it should UPDATE a user given the id', (done) => {
+    describe('/PATCH/:id user', () => {
+        it('it should UPDATE a user given the id', (done) => {
             const user = {
-                title: "The Chronicles of Narnia",
-                author: "C.S. Lewis",
-                year: 1948,
-                pages: 778
+                name: "test user",
+                roles: []
             }
-            user.save((err, user) => {
-                chai.request(app).
-                    put(resourceUrl).
-                    send({
-                        title: "The Chronicles of Narnia",
-                        author: "C.S. Lewis",
-                        year: 1950,
-                        pages: 778
-                    }).
-                    end((err, res) => {
-                        res.should.have.status(200);
-                        res.body.should.be.a('object');
-                        res.body.should.have.property('message').eql('user updated!');
-                        res.body.user.should.have.property('year').eql(1950);
-                        done();
-                    });
-            });
+            chai.request(app).
+                patch(resourceUrl).
+                send(user).
+                end((err, res) => {
+                    res.should.have.status(204);
+                    done();
+                });
         });
     });
-
-    /*
-     * Test the /DEconstE/:id route
-     */
-    describe('/DEconstE/:id user', () => {
-        it.skip('it should DEconstE a user given the id', (done) => {
-            const user = {
-                title: "The Chronicles of Narnia",
-                author: "C.S. Lewis",
-                year: 1948,
-                pages: 778
-            }
-            user.save((err, user) => {
-                chai.request(app).
-                    deconste(resourceUrl).
-                    end((err, res) => {
-                        res.should.have.status(200);
-                        res.body.should.be.a('object');
-                        res.body.should.have.property('message').eql('user successfully deconsted!');
-                        res.body.result.should.have.property('ok').eql(1);
-                        res.body.result.should.have.property('n').eql(1);
-                        done();
-                    });
-            });
+    describe('/DELETE/:id user', () => {
+        it('it should DELETE a user given the id', (done) => {
+            chai.request(app).
+                delete(resourceUrl).
+                end((err, res) => {
+                    res.should.have.status(204);
+                    done();
+                });
         });
     });
 });

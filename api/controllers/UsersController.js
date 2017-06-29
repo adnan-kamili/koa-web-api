@@ -52,7 +52,7 @@ class UsersController {
         const roleNames = ctx.request.body.roles || [];
         const roles = [];
         for (let roleName of roleNames) {
-            roleName = roleName.toLowerCase();
+            roleName = roleName.toString().toLowerCase();
             if (roleName === 'admin') {
                 return ctx.badRequest(`role '${roleName}' is not allowed!`);
             }
@@ -74,9 +74,59 @@ class UsersController {
         return ctx.created(`/v1/users/${user.id}`);
     }
     static async updateUser(ctx) {
+        const roleNames = ctx.request.body.roles;
+        const roles = [];
+        if (roleNames instanceof Array) {
+            for (let roleName of roleNames) {
+                roleName = roleName.toString().toLowerCase();
+                if (roleName === 'admin') {
+                    return ctx.badRequest(`role '${roleName}' is not allowed!`);
+                }
+                const query = {
+                    name: roleName,
+                    tenantId: ctx.state.user.tenantId
+                }
+                const role = await Role.findOne({ where: query });
+                if (!role) {
+                    return ctx.badRequest(`role '${roleName}' does not exist!`);
+                }
+                roles.push(role);
+            }
+        }
+
+        const query = {
+            id: ctx.params.id,
+            tenantId: ctx.state.user.tenantId
+        }
+        const user = await User.findOne({ where: query });
+        if (!user) {
+            return ctx.notFound(`The user id '${ctx.params.id}' does not exist!`);
+        }
+        await user.update(ctx.request.body, { fields: ['name'] });
+        if (roleNames instanceof Array) {
+            await user.setRoles(roles);
+        }
         return ctx.noContent();
     }
+
     static async deleteUser(ctx) {
+        const query = {
+            id: ctx.params.id,
+            tenantId: ctx.state.user.tenantId
+        }
+        const user = await User.findOne({ where: query });
+        if (!user) {
+            return ctx.notFound(`The user id '${ctx.params.id}' does not exist!`);
+        }
+        const roles = await user.getRoles();
+        if (roles.length) {
+            for (const role of roles) {
+                if (role.name === 'admin') {
+                    return ctx.forbidden('admin user cannot be deleted');
+                }
+            }
+        }
+        await user.destroy();
         return ctx.noContent();
     }
 }

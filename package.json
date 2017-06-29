@@ -5,13 +5,14 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "mocha --timeout 30000 ./tests/*.spec.js"
+    "test": "mocha --timeout 30000 ./tests/*.test.js"
   },
   "keywords": [],
   "author": "Adnan Kamili",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^1.0.2",
+    "bcryptjs": "^2.4.3",
     "config": "^1.26.1",
     "kcors": "^2.2.1",
     "koa": "^2.2.0",
