@@ -7,7 +7,8 @@
         "connectionUri" : "mysql://root:root@localhost/test_db"
     },
     "jwt": {
-        "secret": "it is a big secret"
+        "secret": "it is a big secret",
+        "expiry": 3600
     },
     "cors": {
         "origin": "*",

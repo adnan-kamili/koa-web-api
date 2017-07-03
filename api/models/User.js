@@ -39,7 +39,8 @@ module.exports = function (sequelize, DataTypes) {
         {
             instanceMethods: {
                 comparePassword: async function (password) {
-                    await bcrypt.compare(password, this.password);
+                    const matched = await bcrypt.compare(password, this.password);
+                    return matched;
                 }
             },
             hooks: {

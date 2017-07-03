@@ -7,10 +7,18 @@ const appConfig = config.get('app');
 const router = new Router({ prefix: `/${appConfig.version}` });
 
 // Import controllers
+const AccountsController = require('../api/controllers/AccountsController');
 const UsersController = require('../api/controllers/UsersController');
 const RolesController = require('../api/controllers/RolesController');
+const AuthController = require('../api/controllers/AuthController');
 
 // Define the api routes
+
+// Auth routes
+router.post('/auth/token', AuthController.createToken);
+
+// Account routes
+router.post('/accounts', AccountsController.createAccount);
 
 // User routes
 router.get('/users', UsersController.getUsers);
