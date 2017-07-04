@@ -3,8 +3,11 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const jwtConfig = config.get('jwt');
+const Validator = require('../services/Validator');
 
 const { User, Role, RoleClaim } = require('../models');
+const { LoginViewModel } = require('../viewModels/LoginViewModel');
+
 const include = [{
     model: Role,
     as: 'roles',
@@ -18,7 +21,8 @@ const include = [{
 
 class AuthController {
     static async createToken(ctx) {
-        const query = { email: ctx.request.body.username }
+        const viewModel = Validator.validate(ctx.request.body, LoginViewModel);
+        const query = { email: viewModel.username }
         const user = await User.findOne({
             where: query,
             include: include
@@ -26,7 +30,7 @@ class AuthController {
         if (!user) {
             return ctx.unauthorized('invalid email or password!');
         }
-        const matched = await user.comparePassword(ctx.request.body.password);
+        const matched = await user.comparePassword(viewModel);
         if (!matched) {
             return ctx.unauthorized('invalid email or password!');
         }

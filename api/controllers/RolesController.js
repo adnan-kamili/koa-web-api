@@ -1,7 +1,7 @@
 'use strict';
 
 const { Role, RoleClaim } = require('../models');
-const { RoleCreateViewModel, RoleUpdateViewModel } = require('../viewModels/UserViewModel');
+const { RoleCreateViewModel, RoleUpdateViewModel } = require('../viewModels/RoleViewModel');
 const Validator = require('../services/Validator');
 const PermissionClaims = require('../policies/PermissionClaims');
 const ClaimTypes = require('../policies/ClaimTypes');

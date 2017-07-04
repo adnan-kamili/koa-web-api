@@ -4,17 +4,18 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 const jwtConfig = config.get('jwt');
 const Mailer = require('../services/Mailer');
+const Validator = require('../services/Validator');
+
 const { User, Role, Tenant, sequelize } = require('../models');
+const { RegisterViewModel, ResetPasswordViewModel, EmailViewModel } = require('../viewModels/AccountViewModel');
 
 
 class AccountsController {
     static async createAccount(ctx) {
+        const viewModel = Validator.validate(ctx.request.body, RegisterViewModel);
         await sequelize.transaction(async (transaction) => {
-            const tenant = await Tenant.create(ctx.request.body, {
-                fields: ['company'],
-                transaction: transaction
-            });
-            const user = User.build(ctx.request.body);
+            const tenant = await Tenant.create({ company: viewModel.company }, { transaction: transaction });
+            const user = User.build(viewModel);
             user.lastLogin = new Date();
             user.tenantId = tenant.id;
             await user.save({ transaction: transaction });
@@ -29,7 +30,8 @@ class AccountsController {
     }
 
     static async sendPasswordResetLink(ctx) {
-        const query = { email: ctx.request.body.email }
+        const viewModel = Validator.validate(ctx.request.body, EmailViewModel);
+        const query = { email: viewModel.email }
         const user = await User.findOne({ where: query });
         if (user) {
             const payload = {
@@ -45,20 +47,21 @@ class AccountsController {
     }
 
     static async resetPassword(ctx) {
-        const query = { email: ctx.request.body.email }
+        const viewModel = Validator.validate(ctx.request.body, ResetPasswordViewModel);
+        const query = { email: viewModel.email }
         const user = await User.findOne({ where: query });
         if (!user) {
             return ctx.badRequest('email does not exist!');
         }
         try {
-            const decoded = jwt.verify(ctx.request.body.token, user.password);
+            const decoded = jwt.verify(viewModel.token, user.password);
             if (user.email !== decoded.email) {
                 return ctx.badRequest('invalid token!');
             }
         } catch (err) {
             return ctx.badRequest('invalid token!');
         }
-        await user.update({ password: ctx.request.body.password });
+        await user.update({ password: viewModel.password });
         return ctx.noContent();
     }
 }
