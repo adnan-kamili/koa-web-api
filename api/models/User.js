@@ -41,11 +41,21 @@ module.exports = function (sequelize, DataTypes) {
                 comparePassword: async function (password) {
                     const matched = await bcrypt.compare(password, this.password);
                     return matched;
+                },
+                hashPassword: async (password) => {
+                    const hash = await bcrypt.hash(password, SALT_ROUNDS);
+                    return hash;
                 }
             },
             hooks: {
-                afterValidate: async (user) => {
+                beforeCreate: async (user) => {
                     user.password = await bcrypt.hash(user.password, SALT_ROUNDS);
+                },
+                beforeUpdate: async (user, options) => {
+                    if (options.fields.includes('password')) {
+                        user.password = await bcrypt.hash(user.password, SALT_ROUNDS);
+                    }
+
                 }
             }
         });

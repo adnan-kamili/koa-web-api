@@ -19,6 +19,8 @@ router.post('/auth/token', AuthController.createToken);
 
 // Account routes
 router.post('/accounts', AccountsController.createAccount);
+router.put('/accounts/password', AccountsController.sendPasswordResetLink);
+router.put('/accounts/password-reset', AccountsController.resetPassword);
 
 // User routes
 router.get('/users', UsersController.getUsers);

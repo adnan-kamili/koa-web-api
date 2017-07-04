@@ -34,7 +34,8 @@ class AuthController {
         const payload = {
             sub: user.id,
             role: roles,
-            tenantId: user.tenantId
+            tenantId: user.tenantId,
+            usage: "access_token"
         };
         if (!roles.includes('admin')) {
             payload.scope = [];
@@ -47,14 +48,6 @@ class AuthController {
         await user.update({ lastLogin: new Date() });
         return ctx.ok({ access_token: token, expires_in: jwtConfig.expiry });
     }
-
-    // static async sendPasswordResetLink(ctx) {
-
-    // }
-
-    // static async resetPassword(ctx) {
-
-    // }
 }
 
 module.exports = AuthController;
