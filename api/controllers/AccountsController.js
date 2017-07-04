@@ -36,7 +36,7 @@ class AccountsController {
                 email: user.email,
                 usage: 'password_reset_token'
             };
-            const token = jwt.sign(payload, jwtConfig.secret, { expiresIn: jwtConfig.expiry });
+            const token = jwt.sign(payload, user.password, { expiresIn: jwtConfig.expiry });
             const url = `http://app.example.com/reset-password?token=${token}`;
             const message = `<a href="${url}">Click to reset password!</a>`;
             await Mailer.sendEmail(user.email, "Password reset request", message);
@@ -45,16 +45,18 @@ class AccountsController {
     }
 
     static async resetPassword(ctx) {
-        let decoded = null;
-        try {
-            decoded = jwt.verify(ctx.request.body.token, jwtConfig.secret);
-        } catch (err) {
-            return ctx.badRequest('invalid token!');
-        }
-        const query = { email: decoded.email }
+        const query = { email: ctx.request.body.email }
         const user = await User.findOne({ where: query });
         if (!user) {
             return ctx.badRequest('email does not exist!');
+        }
+        try {
+            const decoded = jwt.verify(ctx.request.body.token, user.password);
+            if (user.email !== decoded.email) {
+                return ctx.badRequest('invalid token!');
+            }
+        } catch (err) {
+            return ctx.badRequest('invalid token!');
         }
         await user.update({ password: ctx.request.body.password });
         return ctx.noContent();
