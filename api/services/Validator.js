@@ -1,44 +1,25 @@
 'use strict';
 
-const validate = require('validate.js');
+const Joi = require('joi');
 
-const Constraints = {
-    pagination: function () {
-        const constraint = {
-            page: {
-                numericality: {
-                    onlyInteger: true,
-                    greaterThan: 0,
-                    strict: true
-                }
-            },
-            limit: {
-                numericality: {
-                    onlyInteger: true,
-                    greaterThan: 0,
-                    lessThanOrEqualTo: 100,
-                    strict: true
-                }
-            }
-        };
-        return constraint;
-    }
+const paginationSchema = {
+    page: Joi.number().integer().min(1),
+    limit: Joi.number().integer().min(1).max(100)
 };
 
-const getCleanAttributes = function (attributes, constraints) {
-    attributes = validate.cleanAttributes(attributes, constraints);
-    const errors = validate(attributes, constraints, { format: "flat" });
-    if (errors) {
-        const validationError = new Error(errors[0].toLowerCase());
+const validate = function (attributes, schema) {
+    const { error, value } = Joi.validate(attributes, schema);
+    if (error) {
+        const validationError = new Error(error.details[0].message);
         validationError.status = 400;
         throw validationError;
     }
-    return attributes;
+    return value;
 };
 module.exports = {
     paginationAttributes: function (attributes) {
         attributes.page = attributes.page || 1;
         attributes.limit = attributes.limit || 10;
-        return getCleanAttributes(attributes, Constraints.pagination());
+        return validate(attributes, paginationSchema);
     }
 };
