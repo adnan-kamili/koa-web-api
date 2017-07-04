@@ -34,7 +34,7 @@ app.use(requestLogger());
 app.use(cors(corsConfig));
 
 // JWT middleware for authentication
-app.use(jwt(jwtConfig));
+app.use(jwt(jwtConfig).unless({ path: ['/v1/auth/token', /^\/v1\/accounts/] }));
 
 // Body parser middleware
 app.use(bodyParser({ limit: '1mb' }));
