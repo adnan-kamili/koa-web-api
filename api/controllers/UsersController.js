@@ -102,10 +102,54 @@ class UsersController {
         if (!user) {
             return ctx.notFound(`The user id '${ctx.params.id}' does not exist!`);
         }
+        if (!ctx.state.user.role.includes('admin')) {
+            // Only admin or current user can update current user's profile
+            if (ctx.state.user.sub !== user.id) {
+                return ctx.forbidden('you do not have permissions to update the user');
+            }
+        }
         await user.update(ctx.request.body, { fields: ['name'] });
         if (roleNames instanceof Array) {
             await user.setRoles(roles);
         }
+        return ctx.noContent();
+    }
+
+    static async updatePassword(ctx) {
+        const query = {
+            id: ctx.params.id,
+            tenantId: ctx.state.user.tenantId
+        }
+        const user = await User.findOne({ where: query });
+        if (!user) {
+            return ctx.notFound(`The user id '${ctx.params.id}' does not exist!`);
+        }
+        if (!ctx.state.user.role.includes('admin')) {
+            // Only admin or current user can update current user's profile
+            if (ctx.state.user.sub !== user.id) {
+                return ctx.forbidden('you do not have permissions to update the user');
+            }
+        }
+        await user.update({ password: ctx.request.body.password });
+        return ctx.noContent();
+    }
+
+    static async updateEmail(ctx) {
+        const query = {
+            id: ctx.params.id,
+            tenantId: ctx.state.user.tenantId
+        }
+        const user = await User.findOne({ where: query });
+        if (!user) {
+            return ctx.notFound(`The user id '${ctx.params.id}' does not exist!`);
+        }
+        if (!ctx.state.user.role.includes('admin')) {
+            // Only admin or current user can update current user's profile
+            if (ctx.state.user.sub !== user.id) {
+                return ctx.forbidden('you do not have permissions to update the user');
+            }
+        }
+        await user.update({ email: ctx.request.body.email });
         return ctx.noContent();
     }
 

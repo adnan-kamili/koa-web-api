@@ -27,8 +27,8 @@ router.get('/users', UsersController.getUsers);
 router.get('/users/:id', UsersController.getUser);
 router.post('/users', UsersController.createUser);
 router.patch('/users/:id', UsersController.updateUser);
-//router.put('/users/:id/email', UsersController.updateEmail);
-//router.put('/users/:id/password', UsersController.updatePassword);
+router.put('/users/:id/email', UsersController.updateEmail);
+router.put('/users/:id/password', UsersController.updatePassword);
 router.delete('/users/:id', UsersController.deleteUser);
 
 // Role routes
