@@ -1,6 +1,7 @@
 'use strict';
 
 const { User, Role } = require('../models');
+const { UserCreateViewModel, UserUpdateViewModel } = require('../viewModels/UserViewModel');
 const Validator = require('../services/Validator');
 
 const exclude = ['password'];
@@ -30,7 +31,7 @@ class UsersController {
         return ctx.ok(user);
     }
     static async getUsers(ctx) {
-        const pagination = Validator.paginationAttributes(ctx.query);
+        const pagination = Validator.validatePaginationQuery(ctx.query);
         const offset = (pagination.page - 1) * pagination.limit;
         const query = { tenantId: ctx.state.user.tenantId };
         const result = await User.findAndCountAll({
@@ -49,10 +50,10 @@ class UsersController {
         return ctx.ok(users, pagination);
     }
     static async createUser(ctx) {
-        const roleNames = ctx.request.body.roles || [];
+        const viewModel = Validator.validate(ctx.request.body, UserCreateViewModel);
+        const roleNames = viewModel.roles || [];
         const roles = [];
-        for (let roleName of roleNames) {
-            roleName = roleName.toString().toLowerCase();
+        for (const roleName of roleNames) {
             if (roleName === 'admin') {
                 return ctx.badRequest(`role '${roleName}' is not allowed!`);
             }
@@ -66,7 +67,7 @@ class UsersController {
             }
             roles.push(role);
         }
-        const user = User.build(ctx.request.body);
+        const user = User.build(viewModel);
         user.lastLogin = new Date();
         user.tenantId = ctx.state.user.tenantId;
         await user.save();
@@ -74,9 +75,10 @@ class UsersController {
         return ctx.created(`/v1/users/${user.id}`);
     }
     static async updateUser(ctx) {
-        const roleNames = ctx.request.body.roles;
+        const viewModel = Validator.validate(ctx.request.body, UserUpdateViewModel);
+        const roleNames = viewModel.roles;
         const roles = [];
-        if (roleNames instanceof Array) {
+        if (roleNames) {
             for (let roleName of roleNames) {
                 roleName = roleName.toString().toLowerCase();
                 if (roleName === 'admin') {
@@ -108,8 +110,11 @@ class UsersController {
                 return ctx.forbidden('you do not have permissions to update the user');
             }
         }
-        await user.update(ctx.request.body, { fields: ['name'] });
-        if (roleNames instanceof Array) {
+        if (viewModel.name) {
+            await user.update({ name: viewModel.name });
+        }
+
+        if (roleNames) {
             await user.setRoles(roles);
         }
         return ctx.noContent();

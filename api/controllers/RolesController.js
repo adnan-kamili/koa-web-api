@@ -1,6 +1,7 @@
 'use strict';
 
 const { Role, RoleClaim } = require('../models');
+const { RoleCreateViewModel, RoleUpdateViewModel } = require('../viewModels/UserViewModel');
 const Validator = require('../services/Validator');
 const PermissionClaims = require('../policies/PermissionClaims');
 const ClaimTypes = require('../policies/ClaimTypes');
@@ -30,7 +31,7 @@ class RolesController {
     }
 
     static async getRoles(ctx) {
-        const pagination = Validator.paginationAttributes(ctx.query);
+        const pagination = Validator.validatePaginationQuery(ctx.query);
         const offset = (pagination.page - 1) * pagination.limit;
         const query = { tenantId: ctx.state.user.tenantId };
         const result = await Role.findAndCountAll({
@@ -49,14 +50,15 @@ class RolesController {
     }
 
     static async createRole(ctx) {
-        const claims = ctx.request.body.claims || [];
+        const viewModel = Validator.validate(ctx.request.body, RoleCreateViewModel);
+        const claims = viewModel.claims || [];
         const claimValues = Object.values(PermissionClaims);
         for (const claim of claims) {
             if (!claimValues.includes(claim)) {
                 return ctx.badRequest(`claim ${claim} does not exist`);
             }
         }
-        const role = Role.build(ctx.request.body);
+        const role = Role.build(viewModel);
         role.tenantId = ctx.state.user.tenantId;
         await role.save();
         const claimPromises = []
@@ -72,12 +74,13 @@ class RolesController {
     }
 
     static async updateRole(ctx) {
-        const claims = ctx.request.body.claims;
+        const viewModel = Validator.validate(ctx.request.body, RoleUpdateViewModel);
+        const claims = viewModel.claims;
         const claimValues = Object.values(PermissionClaims);
-        if (claims instanceof Array) {
+        if (claims) {
             for (const claim of claims) {
                 if (!claimValues.includes(claim)) {
-                    return ctx.badRequest(`claim ${claim} does not exist`);
+                    return ctx.badRequest(`claim '${claim}' does not exist`);
                 }
             }
         }
@@ -93,8 +96,8 @@ class RolesController {
         if (role.name === 'admin') {
             return ctx.forbidden('admin role cannot be updated');
         }
-        await role.update(ctx.request.body, { fields: ['name', 'description'] });
-        if (claims instanceof Array) {
+        await role.update(viewModel);
+        if (claims) {
             await RoleClaim.destroy({ where: { roleId: role.id } });
             const claimPromises = []
             for (const claim of claims) {
