@@ -4,17 +4,16 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        {
-            "type": "node",
-            "request": "attach",
-            "name": "Attach",
-            "port": 5858
-        },
+
         {
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceRoot}/app.js"
+            "program": "${workspaceRoot}/build/app.js",
+            "outFiles": [
+                "${workspaceRoot}/build/**/*.js"
+            ],
+            "protocol": "inspector"
         }
     ]
 }

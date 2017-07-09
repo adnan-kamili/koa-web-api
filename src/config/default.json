@@ -1,0 +1,21 @@
+{
+    "app": {
+        "port": 4000,
+        "version": "v1"
+    },
+    "database": {
+        "connectionUri" : "mysql://root:root@localhost/test_db"
+    },
+    "jwt": {
+        "secret": "it is a big secret",
+        "expiry": 3600
+    },
+    "cors": {
+        "origin": "*",
+        "maxAge": 864000
+    },
+    "logger" : {
+        "console": true,
+        "level": "info"
+    }
+}

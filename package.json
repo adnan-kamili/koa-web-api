@@ -4,8 +4,11 @@
   "description": "Koa MVC",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "test": "mocha --timeout 30000 ./tests/*.test.js"
+    "test": "mocha --timeout 30000 ./tests/*.test.js",
+    "start": "tsc && node ./build/app.js",
+    "start:watch": "npm run build:watch & nodemon ./build/app.js",
+    "build": "tsc",
+    "build:watch": "npm run build -- -w"
   },
   "keywords": [],
   "author": "Adnan Kamili",
@@ -26,15 +29,25 @@
     "koa-router": "^7.2.0",
     "mysql": "^2.13.0",
     "oidc-provider": "^2.0.0-pre.3",
+    "reflect-metadata": "^0.1.10",
+    "routing-controllers": "^0.7.0",
     "sequelize": "^3.30.4",
+    "typedi": "^0.5.2",
+    "typeorm": "0.1.0-alpha.31",
     "winston": "^2.3.1",
     "winston-daily-rotate-file": "^1.4.6"
   },
   "devDependencies": {
     "@types/koa": "^2.0.39",
+    "@types/koa-bodyparser": "^3.0.23",
+    "@types/koa-router": "^7.0.22",
+    "@types/node": "^8.0.7",
+    "@types/bcrypt": "^1.0.0",
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
     "eslint": "^3.19.0",
-    "mocha": "^3.3.0"
+    "mocha": "^3.3.0",
+    "ts-node": "^3.2.0",
+    "typescript": "^2.4.1"
   }
 }
