@@ -1,5 +1,5 @@
 import { Controller, Body, Post, Ctx, UnauthorizedError } from "routing-controllers";
-import { hash } from 'bcrypt';
+import { hash } from 'bcryptjs';
 import { Repository } from '../repository/Repository';
 import { User } from '../models/User';
 import { Role } from '../models/Role';

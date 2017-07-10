@@ -5,16 +5,15 @@
   "main": "app.js",
   "scripts": {
     "test": "mocha --timeout 30000 ./tests/*.test.js",
-    "start": "tsc && node ./build/app.js",
+    "start": "node_modules/.bin/tsc && node ./build/app.js",
     "start:watch": "npm run build:watch & nodemon ./build/app.js",
-    "build": "tsc",
+    "build": "node_modules/.bin/tsc",
     "build:watch": "npm run build -- -w"
   },
   "keywords": [],
   "author": "Adnan Kamili",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^1.0.2",
     "bcryptjs": "^2.4.3",
     "config": "^1.26.1",
     "joi": "^10.6.0",
@@ -42,7 +41,7 @@
     "@types/koa-bodyparser": "^3.0.23",
     "@types/koa-router": "^7.0.22",
     "@types/node": "^8.0.7",
-    "@types/bcrypt": "^1.0.0",
+    "@types/bcryptjs": "^2.4.0",
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
     "eslint": "^3.19.0",
