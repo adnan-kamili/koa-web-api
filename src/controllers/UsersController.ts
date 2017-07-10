@@ -99,7 +99,7 @@ export class UsersController {
     @Patch("/:id")
     @Authorized(PermissionClaims.readUser)
     @HttpCode(204)
-    async update( @Ctx() ctx: any, @Param("id") id: number, @Body() viewModel: UserViewModel) {
+    async update( @Ctx() ctx: any, @Param("id") id: number, @Body({ validate: { skipMissingProperties: true }}) viewModel: UserViewModel) {
         const query = {
             id: id,
             tenantId: ctx.state.user.tenantId
@@ -114,6 +114,10 @@ export class UsersController {
 
         const roleNames = viewModel.roles;
         if (roleNames) {
+            if (!ctx.state.user.role.includes('admin')) {
+                // Only admin user can update current user's roles
+                throw new ForbiddenError('you do not have permissions to update the user roles');
+            }
             user.roles = [];
             for (const roleName of roleNames) {
                 if (roleName === 'admin') {
@@ -131,12 +135,6 @@ export class UsersController {
             }
         }
 
-        if (!ctx.state.user.role.includes('admin')) {
-            // Only admin or current user can update current user's profile
-            if (ctx.state.user.sub !== user.id) {
-                throw new ForbiddenError('you do not have permissions to update the user');
-            }
-        }
         if (viewModel.name) {
             user.name = viewModel.name;
         }
@@ -215,7 +213,7 @@ export class UsersController {
                 }
             }
         }
-        await this.roleRepository.remove(user);
+        await this.userRepository.remove(user);
     }
 
 }

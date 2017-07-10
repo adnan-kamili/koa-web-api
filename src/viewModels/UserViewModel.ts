@@ -1,4 +1,4 @@
-import { MaxLength, IsEmail, MinLength, IsArray, IsAscii} from 'class-validator';
+import { MaxLength, IsEmail, Length, IsArray, IsAscii, ArrayUnique, ArrayMaxSize} from 'class-validator';
 
 export class UserViewModel {
 
@@ -9,10 +9,11 @@ export class UserViewModel {
     email: string;
 
     @IsAscii()
-    @MinLength(6)
-    @MaxLength(72)
+    @Length(6,72)
     password: string;
 
+    @ArrayUnique()
+    @ArrayMaxSize(10)
     @IsArray()
-    roles: Array<string>
+    roles: string[]
 }

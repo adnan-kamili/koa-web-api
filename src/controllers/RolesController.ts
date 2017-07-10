@@ -131,7 +131,13 @@ export class RolesController {
         }
         const role = await this.roleRepository.findOne({
             where: query,
-            join: join
+            join: {
+                alias: "role",
+                leftJoinAndSelect: {
+                    claims: "role.claims",
+                    users: "role.users"
+                }
+            }
         });
         if (!role) {
             throw new NotFoundError(`role id '${ctx.params.id}' does not exist!`);
@@ -139,9 +145,8 @@ export class RolesController {
         if (role.name === 'admin') {
             throw new ForbiddenError('admin role cannot be deleted');
         }
-        const users = await role.getUsers();
         if (role.users.length) {
-            throw new HttpError(409, "Role is in use. Please delete the user first")
+            throw new HttpError(409, "role is in use. Please delete the user first")
         }
         await this.roleRepository.remove(role);
     }
