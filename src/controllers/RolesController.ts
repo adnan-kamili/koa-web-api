@@ -8,10 +8,10 @@ import { Repository } from '../repository/Repository';
 import { User } from '../models/User';
 import { Role } from '../models/Role';
 
-const include = {
+const join = {
     alias: "role",
-    innerJoinAndSelect: {
-        "claims": "role.claims"
+    leftJoinAndSelect: {
+        claims: "role.claims"
     }
 }
 
@@ -32,21 +32,12 @@ export class RolesController {
         limit = (limit < 0) ? 0 : limit;
         limit = (limit > 100) ? 100 : limit;
         const offset = (page - 1) * limit;
-        // const [roles, count] = await this.roleRepository.findAndCount({
-        //     where: { tenantId: ctx.state.user.tenantId },
-        //     alias: "role",
-        //     leftJoinAndSelect: {
-        //         "claims": "role.claims"
-        //     },
-        //     limit: limit,
-        //     offset: offset
-        // });
-        const [roles, count] = await this.roleRepository.createQueryBuilder("role")
-            .where("role.tenantId = :tenantId", { tenantId: ctx.state.user.tenantId })
-            .leftJoinAndSelect("role.claims", "claims")
-            .offset(offset)
-            .limit(limit)
-            .getManyAndCount();
+        const [roles, count] = await this.roleRepository.findAndCount({
+            where: { tenantId: ctx.state.user.tenantId },
+            join: join,
+            limit: limit,
+            offset: offset
+        });
         ctx.state.pagination = { page, limit, count };
         roles.map((role: any) => {
             role.claims = role.claims.map((claim: any) => claim.claimValue);
@@ -64,10 +55,7 @@ export class RolesController {
         }
         const role = await this.roleRepository.findOne({
             where: query,
-            alias: "role",
-            leftJoinAndSelect: {
-                "claims": "role.claims"
-            }
+            join: join
         });
         if (!role) {
             throw new NotFoundError(`role id '${ctx.params.id}' does not exist!`);
@@ -108,10 +96,7 @@ export class RolesController {
         }
         const role = await this.roleRepository.findOne({
             where: query,
-            alias: "role",
-            leftJoinAndSelect: {
-                "claims": "role.claims"
-            }
+            join: join
         });
         if (!role) {
             throw new NotFoundError(`role id '${ctx.params.id}' does not exist!`);
@@ -146,10 +131,7 @@ export class RolesController {
         }
         const role = await this.roleRepository.findOne({
             where: query,
-            alias: "role",
-            leftJoinAndSelect: {
-                "users": "role.users"
-            }
+            join: join
         });
         if (!role) {
             throw new NotFoundError(`role id '${ctx.params.id}' does not exist!`);

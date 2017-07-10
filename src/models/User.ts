@@ -22,5 +22,5 @@ export class User extends BaseTenantEntity{
         cascadeUpdate: true
     })
     @JoinTable()
-    roles: Role[] = [];
+    roles: Role[];
 }

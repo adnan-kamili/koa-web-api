@@ -1,5 +1,5 @@
 import { Controller, Body, Post, Ctx, UnauthorizedError } from "routing-controllers";
-import { compare } from 'bcrypt';
+import { compare } from 'bcryptjs';
 import { Repository } from '../repository/Repository';
 import { User } from '../models/User';
 import { Role } from '../models/Role';
@@ -25,10 +25,12 @@ export class AuthController {
         const query = { email: viewModel.email };
         const user = await this.userRepository.findOne({
             where: query,
-            alias: "user",
-            leftJoinAndSelect: {
-                "roles": "user.roles",
-                "claims": "roles.claims"
+            join: {
+                alias: "user",
+                leftJoinAndSelect: {
+                    roles: "user.roles",
+                    claims: "roles.claims"
+                }
             }
         });
         if (!user) {

@@ -1,6 +1,6 @@
 import { Controller, Param, Body, Get, Post, Put, Patch, Delete, NotFoundError, ForbiddenError } from "routing-controllers";
 import { HttpCode, Authorized, Ctx, QueryParam, UseAfter, BadRequestError } from "routing-controllers";
-import { hash, compare } from 'bcrypt';
+import { hash, compare } from 'bcryptjs';
 import { PermissionClaims } from '../policies/PermissionClaims';
 import { PaginationHeader } from '../middlewares/PaginationHeader';
 import { Repository } from '../repository/Repository';
@@ -11,7 +11,12 @@ import { UserViewModel } from '../viewModels/UserViewModel';
 import { EmailViewModel } from '../viewModels/EmailViewModel';
 import { PasswordViewModel } from '../viewModels/PasswordViewModel';
 
-
+const join = {
+    alias: "user",
+    leftJoinAndSelect: {
+        roles: "user.roles"
+    }
+}
 
 @Controller("/users")
 export class UsersController {
@@ -33,19 +38,10 @@ export class UsersController {
         const offset = (page - 1) * limit;
         const [users, count] = await this.userRepository.findAndCount({
             where: { tenantId: ctx.state.user.tenantId },
-            alias: "user",
-            leftJoinAndSelect: {
-                "role": "user.roles"
-            },
+            join: join,
             limit: limit,
             offset: offset
         });
-        // const [users, count] = await this.userRepository.createQueryBuilder("user")
-        //     .where("user.tenantId = :tenantId", { tenantId: ctx.state.user.tenantId })
-        //     .leftJoinAndSelect("user.roles", "role")
-        //     .offset(offset)
-        //     .limit(limit)
-        //     .getManyAndCount();
         ctx.state.pagination = { page, limit, count };
         users.map((user: any) => {
             user.roles = user.roles.map((role: any) => role.name);
@@ -63,10 +59,7 @@ export class UsersController {
         }
         const user = await this.userRepository.findOne({
             where: query,
-            alias: "user",
-            leftJoinAndSelect: {
-                "roles": "user.roles"
-            }
+            join: join,
         });
         if (!user) {
             throw new NotFoundError(`user id '${ctx.params.id}' does not exist!`);
@@ -113,10 +106,7 @@ export class UsersController {
         }
         const user = await this.userRepository.findOne({
             where: query,
-            alias: "user",
-            leftJoinAndSelect: {
-                "roles": "user.roles"
-            }
+            join: join
         });
         if (!user) {
             throw new NotFoundError(`user id '${ctx.params.id}' does not exist!`);
@@ -213,10 +203,7 @@ export class UsersController {
         }
         const user = await this.userRepository.findOne({
             where: query,
-            alias: "user",
-            leftJoinAndSelect: {
-                "roles": "user.roles"
-            }
+            join: join
         });
         if (!user) {
             throw new NotFoundError(`user id '${ctx.params.id}' does not exist!`);
