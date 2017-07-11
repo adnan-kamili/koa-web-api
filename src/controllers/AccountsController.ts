@@ -1,14 +1,15 @@
 import { Controller, Body, Post, Ctx, UnauthorizedError } from "routing-controllers";
-import { hash } from 'bcryptjs';
-import { Repository } from '../repository/Repository';
-import { User } from '../models/User';
-import { Role } from '../models/Role';
-import { Tenant } from '../models/Tenant';
-import { RegisterViewModel } from '../viewModels/RegisterViewModel';
+import { hash } from "bcryptjs";
+import { sign, verify } from "jsonwebtoken";
+import * as config from "config";
 
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const jwtConfig = config.get('jwt');
+import { Repository } from "../repository/Repository";
+import { User } from "../models/User";
+import { Role } from "../models/Role";
+import { Tenant } from "../models/Tenant";
+import { RegisterViewModel } from "../viewModels/RegisterViewModel";
+
+const jwtConfig = config.get("jwt");
 
 @Controller("/accounts")
 export class AccountsController {
@@ -30,9 +31,9 @@ export class AccountsController {
         tenant.company = viewModel.company;
         await this.tenantRepository.persist(tenant);
         const role = this.roleRepository.create({
-            name: 'admin',
-            description: 'admin role',
-            tenantId: tenant.id
+            name: "admin",
+            description: "admin role",
+            tenantId: tenant.id,
         });
         await this.roleRepository.persist(role);
         const user = this.userRepository.create(viewModel);

@@ -1,22 +1,20 @@
-import { Controller, Param, Body, Get, Post, Put, Patch, Delete, NotFoundError, ForbiddenError } from "routing-controllers";
-import { HttpCode, Authorized, Ctx, QueryParam, UseAfter, BadRequestError } from "routing-controllers";
-import { hash, compare } from 'bcryptjs';
-import { PermissionClaims } from '../policies/PermissionClaims';
-import { PaginationHeader } from '../middlewares/PaginationHeader';
-import { Repository } from '../repository/Repository';
-import { User } from '../models/User';
-import { Role } from '../models/Role';
+import { Controller, Ctx, Param, Body, QueryParam, Get, Post, Put, Patch, Delete } from "routing-controllers";
+import { NotFoundError, ForbiddenError, BadRequestError } from "routing-controllers";
+import { Authorized, HttpCode, UseAfter } from "routing-controllers";
+import { hash, compare } from "bcryptjs";
+import { PermissionClaims } from "../policies/PermissionClaims";
+import { PaginationHeader } from "../middlewares/PaginationHeader";
+import { Repository } from "../repository/Repository";
+import { User } from "../models/User";
+import { Role } from "../models/Role";
 
-import { UserViewModel } from '../viewModels/UserViewModel';
-import { EmailViewModel } from '../viewModels/EmailViewModel';
-import { PasswordViewModel } from '../viewModels/PasswordViewModel';
+import { UserViewModel } from "../viewModels/UserViewModel";
+import { EmailViewModel } from "../viewModels/EmailViewModel";
+import { PasswordViewModel } from "../viewModels/PasswordViewModel";
 
-const join = {
-    alias: "user",
-    leftJoinAndSelect: {
-        roles: "user.roles"
-    }
-}
+const join = { alias: "user", leftJoinAndSelect: { roles: "user.roles" } };
+const updateBodyOptions = { validate: { skipMissingProperties: true } };
+const SALT_ROUNDS = 10;
 
 @Controller("/users")
 export class UsersController {
@@ -37,10 +35,7 @@ export class UsersController {
         limit = (limit > 100) ? 100 : limit;
         const offset = (page - 1) * limit;
         const [users, count] = await this.userRepository.findAndCount({
-            where: { tenantId: ctx.state.user.tenantId },
-            join: join,
-            limit: limit,
-            offset: offset
+            where: { tenantId: ctx.state.user.tenantId }, join, limit, offset
         });
         ctx.state.pagination = { page, limit, count };
         users.map((user: any) => {
@@ -53,14 +48,8 @@ export class UsersController {
     @Get("/:id")
     @Authorized(PermissionClaims.readUser)
     async get( @Ctx() ctx: any, @Param("id") id: number) {
-        const query = {
-            id: id,
-            tenantId: ctx.state.user.tenantId
-        }
-        const user = await this.userRepository.findOne({
-            where: query,
-            join: join,
-        });
+        const query = { id, tenantId: ctx.state.user.tenantId };
+        const user = await this.userRepository.findOne({ where: query, join });
         if (!user) {
             throw new NotFoundError(`user id '${ctx.params.id}' does not exist!`);
         }
@@ -69,23 +58,23 @@ export class UsersController {
     }
 
     @Post()
-    @Authorized(PermissionClaims.readUser)
+    @Authorized(PermissionClaims.createUser)
     @HttpCode(201)
     async create( @Ctx() ctx: any, @Body() viewModel: UserViewModel) {
         const user = this.userRepository.create(viewModel);
         user.tenantId = ctx.state.user.tenantId;
         user.lastLogin = new Date();
-        user.password = await hash(viewModel.password, 10);
+        user.password = await hash(viewModel.password, SALT_ROUNDS);
         user.roles = [];
         const roleNames = viewModel.roles || [];
         for (const roleName of roleNames) {
-            if (roleName === 'admin') {
+            if (roleName === "admin") {
                 throw new BadRequestError(`role '${roleName}' is not allowed!`);
             }
             const query = {
                 name: roleName,
                 tenantId: ctx.state.user.tenantId
-            }
+            };
             const role = await this.roleRepository.findOne({ where: query });
             if (!role) {
                 throw new BadRequestError(`role '${roleName}' does not exist!`);
@@ -93,20 +82,20 @@ export class UsersController {
             user.roles.push(role);
         }
         await this.userRepository.persist(user);
-        return { message: "created user" };
+        return { message: "user created successfully!" };
     }
 
     @Patch("/:id")
-    @Authorized(PermissionClaims.readUser)
+    @Authorized(PermissionClaims.updateUser)
     @HttpCode(204)
-    async update( @Ctx() ctx: any, @Param("id") id: number, @Body({ validate: { skipMissingProperties: true }}) viewModel: UserViewModel) {
+    async update( @Ctx() ctx: any, @Param("id") id: number, @Body(updateBodyOptions) viewModel: UserViewModel) {
         const query = {
-            id: id,
+            id,
             tenantId: ctx.state.user.tenantId
-        }
+        };
         const user = await this.userRepository.findOne({
             where: query,
-            join: join
+            join
         });
         if (!user) {
             throw new NotFoundError(`user id '${ctx.params.id}' does not exist!`);
@@ -114,20 +103,20 @@ export class UsersController {
 
         const roleNames = viewModel.roles;
         if (roleNames) {
-            if (!ctx.state.user.role.includes('admin')) {
+            if (!ctx.state.user.role.includes("admin")) {
                 // Only admin user can update current user's roles
-                throw new ForbiddenError('you do not have permissions to update the user roles');
+                throw new ForbiddenError("you do not have permissions to update the user roles");
             }
             user.roles = [];
             for (const roleName of roleNames) {
-                if (roleName === 'admin') {
+                if (roleName === "admin") {
                     throw new BadRequestError(`role '${roleName}' is not allowed!`);
                 }
-                const query = {
+                const roleQuery = {
                     name: roleName,
                     tenantId: ctx.state.user.tenantId
-                }
-                const role = await this.roleRepository.findOne({ where: query });
+                };
+                const role = await this.roleRepository.findOne({ where: roleQuery });
                 if (!role) {
                     throw new BadRequestError(`role '${roleName}' does not exist!`);
                 }
@@ -142,49 +131,49 @@ export class UsersController {
     }
 
     @Put("/:id/password")
-    @Authorized(PermissionClaims.readUser)
+    @Authorized(PermissionClaims.updateUser)
     @HttpCode(204)
     async updatePassword( @Ctx() ctx: any, @Param("id") id: number, @Body() viewModel: PasswordViewModel) {
         const query = {
-            id: id,
+            id,
             tenantId: ctx.state.user.tenantId
-        }
+        };
         const user = await this.userRepository.findOne({ where: query });
         if (!user) {
             throw new NotFoundError(`user id '${ctx.params.id}' does not exist!`);
         }
 
-        if (!ctx.state.user.role.includes('admin')) {
+        if (!ctx.state.user.role.includes("admin")) {
             // Only admin or current user can update current user's profile
             if (ctx.state.user.sub !== user.id) {
-                throw new ForbiddenError('you do not have permissions to update the user');
+                throw new ForbiddenError("you do not have permissions to update the user");
             }
         }
         const matched = await compare(viewModel.password, user.password);
         if (!matched) {
             throw new BadRequestError(`incorrect password!`);
         }
-        user.password = await hash(viewModel.newPassword, 10);
+        user.password = await hash(viewModel.newPassword, SALT_ROUNDS);
         await this.userRepository.persist(user);
     }
 
     @Put("/:id/email")
-    @Authorized(PermissionClaims.readUser)
+    @Authorized(PermissionClaims.updateUser)
     @HttpCode(204)
     async updateEmail( @Ctx() ctx: any, @Param("id") id: number, @Body() viewModel: EmailViewModel) {
         const query = {
-            id: id,
+            id,
             tenantId: ctx.state.user.tenantId
-        }
+        };
         const user = await this.userRepository.findOne({ where: query });
         if (!user) {
             throw new NotFoundError(`user id '${ctx.params.id}' does not exist!`);
         }
 
-        if (!ctx.state.user.role.includes('admin')) {
+        if (!ctx.state.user.role.includes("admin")) {
             // Only admin or current user can update current user's profile
             if (ctx.state.user.sub !== user.id) {
-                throw new ForbiddenError('you do not have permissions to update the user');
+                throw new ForbiddenError("you do not have permissions to update the user");
             }
         }
         user.email = viewModel.email;
@@ -196,20 +185,20 @@ export class UsersController {
     @HttpCode(204)
     async delete( @Ctx() ctx: any, @Param("id") id: number) {
         const query = {
-            id: id,
+            id,
             tenantId: ctx.state.user.tenantId
-        }
+        };
         const user = await this.userRepository.findOne({
             where: query,
-            join: join
+            join
         });
         if (!user) {
             throw new NotFoundError(`user id '${ctx.params.id}' does not exist!`);
         }
         if (user.roles.length) {
             for (const role of user.roles) {
-                if (role.name === 'admin') {
-                    throw new ForbiddenError('admin user cannot be deleted');
+                if (role.name === "admin") {
+                    throw new ForbiddenError("admin user cannot be deleted");
                 }
             }
         }

@@ -42,6 +42,8 @@
     "@types/koa-router": "^7.0.22",
     "@types/node": "^8.0.7",
     "@types/bcryptjs": "^2.4.0",
+    "@types/config": "0.0.32",
+    "@types/jsonwebtoken": "^7.2.2",
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
     "eslint": "^3.19.0",
