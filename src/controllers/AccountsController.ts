@@ -25,6 +25,7 @@ export class AccountsController {
     }
 
     @Post()
+    @HttpCode(201)
     async create( @Body() viewModel: RegisterViewModel) {
         await this.repository.transaction(async (repository) => {
 
@@ -48,7 +49,7 @@ export class AccountsController {
             }
             user.tenantId = tenant.id;
             user.lastLogin = new Date();
-            user.password = await hash(viewModel.password, 10);
+            user.password = await hash(viewModel.password, SALT_ROUNDS);
             user.roles = [role];
             await userRepository.persist(user);
             return { message: "account created sucessfully!" };

@@ -1,20 +1,15 @@
 import { Controller, Param, Body, Get, Post, Patch, Delete, ForbiddenError, HttpError } from "routing-controllers";
 import { HttpCode, Authorized, Ctx, QueryParam, UseAfter, BadRequestError, NotFoundError } from "routing-controllers";
-import { RoleViewModel } from '../viewModels/RoleViewModel';
-import { PermissionClaims } from '../policies/PermissionClaims';
-import { ClaimTypes } from '../policies/ClaimTypes';
-import { PaginationHeader } from '../middlewares/PaginationHeader';
-import { Repository } from '../repository/Repository';
-import { User } from '../models/User';
-import { Role } from '../models/Role';
+import { RoleViewModel } from "../viewModels/RoleViewModel";
+import { PermissionClaims } from "../policies/PermissionClaims";
+import { ClaimTypes } from "../policies/ClaimTypes";
+import { PaginationHeader } from "../middlewares/PaginationHeader";
+import { Repository } from "../repository/Repository";
+import { User } from "../models/User";
+import { Role } from "../models/Role";
 
-const join = {
-    alias: "role",
-    leftJoinAndSelect: {
-        claims: "role.claims"
-    }
-}
-
+const join = { alias: "role", leftJoinAndSelect: { claims: "role.claims" } };
+const updateBodyOptions = { validate: { skipMissingProperties: true } };
 
 @Controller("/roles")
 export class RolesController {
@@ -33,10 +28,7 @@ export class RolesController {
         limit = (limit > 100) ? 100 : limit;
         const offset = (page - 1) * limit;
         const [roles, count] = await this.roleRepository.findAndCount({
-            where: { tenantId: ctx.state.user.tenantId },
-            join: join,
-            limit: limit,
-            offset: offset
+            where: { tenantId: ctx.state.user.tenantId }, join, limit, offset
         });
         ctx.state.pagination = { page, limit, count };
         roles.map((role: any) => {
@@ -50,13 +42,10 @@ export class RolesController {
     @Authorized(PermissionClaims.readRole)
     async get( @Ctx() ctx: any, @Param("id") id: number) {
         const query = {
-            id: id,
+            id,
             tenantId: ctx.state.user.tenantId
-        }
-        const role = await this.roleRepository.findOne({
-            where: query,
-            join: join
-        });
+        };
+        const role = await this.roleRepository.findOne({ where: query, join });
         if (!role) {
             throw new NotFoundError(`role id '${ctx.params.id}' does not exist!`);
         }
@@ -65,7 +54,7 @@ export class RolesController {
     }
 
     @Post()
-    @Authorized(PermissionClaims.readRole)
+    @Authorized(PermissionClaims.createRole)
     @HttpCode(201)
     async create( @Ctx() ctx: any, @Body() viewModel: RoleViewModel) {
         const role = this.roleRepository.create(viewModel);
@@ -91,26 +80,21 @@ export class RolesController {
             });
         }
         await this.roleRepository.persist(role);
-        return { message: "created user" };
+        ctx.set("Location", `/v1/roles/${role.id}`);
+        return { message: "role created successfully!" };
     }
 
     @Patch("/:id")
-    @Authorized(PermissionClaims.readRole)
+    @Authorized(PermissionClaims.updateRole)
     @HttpCode(204)
-    async update( @Ctx() ctx: any, @Param("id") id: number, @Body() viewModel: RoleViewModel) {
-        const query = {
-            id: id,
-            tenantId: ctx.state.user.tenantId
-        }
-        const role = await this.roleRepository.findOne({
-            where: query,
-            join: join
-        });
+    async update( @Ctx() ctx: any, @Param("id") id: number, @Body(updateBodyOptions) viewModel: RoleViewModel) {
+        const query = { id, tenantId: ctx.state.user.tenantId };
+        let role = await this.roleRepository.findOne({ where: query, join });
         if (!role) {
             throw new NotFoundError(`role id '${ctx.params.id}' does not exist!`);
         }
-        if (role.name === 'admin') {
-            throw new ForbiddenError('admin role cannot be updated');
+        if (role.name === "admin") {
+            throw new ForbiddenError("admin role cannot be updated");
         }
         const claims = viewModel.claims;
         const claimValues = Object.values(PermissionClaims);
@@ -123,9 +107,10 @@ export class RolesController {
                 role.claims.push({
                     claimType: ClaimTypes.permission,
                     claimValue: claim
-                })
+                });
             }
         }
+        role = { ...role, ...viewModel };
         await this.roleRepository.persist(role);
     }
 
@@ -133,10 +118,7 @@ export class RolesController {
     @Authorized(PermissionClaims.deleteRole)
     @HttpCode(204)
     async delete( @Ctx() ctx: any, @Param("id") id: number) {
-        const query = {
-            id: id,
-            tenantId: ctx.state.user.tenantId
-        }
+        const query = { id, tenantId: ctx.state.user.tenantId };
         const role = await this.roleRepository.findOne({
             where: query,
             join: {
@@ -150,13 +132,12 @@ export class RolesController {
         if (!role) {
             throw new NotFoundError(`role id '${ctx.params.id}' does not exist!`);
         }
-        if (role.name === 'admin') {
-            throw new ForbiddenError('admin role cannot be deleted');
+        if (role.name === "admin") {
+            throw new ForbiddenError("admin role cannot be deleted");
         }
         if (role.users.length) {
-            throw new HttpError(409, "role is in use. Please delete the user first")
+            throw new HttpError(409, "role is in use");
         }
         await this.roleRepository.remove(role);
     }
-
 }
