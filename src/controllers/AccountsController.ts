@@ -27,7 +27,7 @@ export class AccountsController {
     @Post()
     @HttpCode(201)
     async create( @Body() viewModel: RegisterViewModel) {
-        await this.repository.transaction(async (repository) => {
+        return await this.repository.transaction(async (repository) => {
 
             const userRepository = repository.getRepository(User);
             const roleRepository = repository.getRepository(Role);
@@ -52,7 +52,7 @@ export class AccountsController {
             user.password = await hash(viewModel.password, SALT_ROUNDS);
             user.roles = [role];
             await userRepository.persist(user);
-            return { message: "account created sucessfully!" };
+            return { message: "account created successfully!" };
         });
     }
 

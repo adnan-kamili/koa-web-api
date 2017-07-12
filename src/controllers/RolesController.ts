@@ -110,6 +110,12 @@ export class RolesController {
                 });
             }
         }
+        if (viewModel.name && viewModel.name !== role.name) {
+            const roleQuery = { name: role.name, tenantId: ctx.state.user.tenantId };
+            if (await this.roleRepository.findOne({ where: roleQuery })) {
+                throw new BadRequestError(`role '${role.name}' already exists!`);
+            }
+        }
         role = { ...role, ...viewModel };
         await this.roleRepository.persist(role);
     }

@@ -1,7 +1,10 @@
-import { MaxLength, IsEmail, MinLength, IsArray, IsAscii} from 'class-validator';
+import { MaxLength, IsEmail, Length, IsArray, IsAscii, IsNotEmpty } from "class-validator";
+import {IsStrict} from "../validators/IsStrict";
 
+//@IsStrict("1", {})
 export class RegisterViewModel {
 
+    @IsNotEmpty()
     @MaxLength(256)
     name: string;
 
@@ -9,10 +12,10 @@ export class RegisterViewModel {
     email: string;
 
     @IsAscii()
-    @MinLength(6)
-    @MaxLength(72)
+    @Length(6, 72)
     password: string;
 
+    @IsNotEmpty()
     @MaxLength(256)
     company: string;
 }
