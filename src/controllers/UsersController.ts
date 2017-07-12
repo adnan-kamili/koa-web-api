@@ -64,7 +64,7 @@ export class UsersController {
         const user = this.userRepository.create(viewModel);
         user.email = user.email.toLowerCase();
         if (await this.userRepository.findOne({ where: { email: user.email } })) {
-            throw new BadRequestError(`email '${viewModel.email}' already exists!`);
+            throw new BadRequestError(`email already exists!`);
         }
         user.tenantId = ctx.state.user.tenantId;
         user.lastLogin = new Date();
@@ -183,7 +183,7 @@ export class UsersController {
         }
         if (viewModel.email.toLowerCase() !== user.email) {
             if (await this.userRepository.findOne({ where: { email: viewModel.email.toLowerCase() } })) {
-                throw new BadRequestError(`email '${viewModel.email}' already exists!`);
+                throw new BadRequestError(`email already exists!`);
             }
         }
         user.email = viewModel.email.toLowerCase();

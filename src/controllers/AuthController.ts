@@ -1,13 +1,13 @@
 import { Controller, Body, Post, Ctx, UnauthorizedError } from "routing-controllers";
-import { compare } from 'bcryptjs';
-import { Repository } from '../repository/Repository';
-import { User } from '../models/User';
-import { Role } from '../models/Role';
-import { LoginViewModel } from '../viewModels/LoginViewModel';
+import { compare } from "bcryptjs";
+import { Repository } from "../repository/Repository";
+import { User } from "../models/User";
+import { Role } from "../models/Role";
+import { LoginViewModel } from "../viewModels/LoginViewModel";
 
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const jwtConfig = config.get('jwt');
+const jwt = require("jsonwebtoken");
+const config = require("config");
+const jwtConfig = config.get("jwt");
 
 @Controller("/auth")
 export class AuthController {
@@ -48,7 +48,7 @@ export class AuthController {
             usage: "access_token",
             scope: new Array()
         };
-        if (!roles.includes('admin')) {
+        if (!roles.includes("admin")) {
             for (const role of user.roles) {
                 const claims = role.claims.map((claim: any) => claim.claimValue);
                 payload.scope.push(...claims);

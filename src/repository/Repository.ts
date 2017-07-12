@@ -1,6 +1,4 @@
 import { Container, Inject, Service } from "typedi";
-import { BaseEntity } from '../models/BaseEntity';
-
 
 @Service()
 export class Repository {
@@ -11,5 +9,9 @@ export class Repository {
 
     getRepository(entity: any) {
         return this.connection.getRepository(entity);
+    }
+
+    transaction(cb: (repository: Repository) => Promise<any>|any): Promise<any> {
+        return this.connection.transaction(cb);
     }
 }
