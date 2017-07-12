@@ -1,8 +1,7 @@
-import { MaxLength, IsEmail, MinLength, IsArray, IsAscii, IsLowercase, ArrayUnique} from 'class-validator';
+import { MaxLength, IsEmail, MinLength, IsArray, IsAscii, IsLowercase, ArrayUnique} from "class-validator";
 
 export class RoleViewModel {
 
-    @IsLowercase()
     @MaxLength(256)
     name: string;
 
@@ -11,5 +10,5 @@ export class RoleViewModel {
 
     @ArrayUnique()
     @IsArray()
-    claims: string[]
+    claims: string[];
 }

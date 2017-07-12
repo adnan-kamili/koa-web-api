@@ -69,7 +69,15 @@ export class RolesController {
     @HttpCode(201)
     async create( @Ctx() ctx: any, @Body() viewModel: RoleViewModel) {
         const role = this.roleRepository.create(viewModel);
+        role.name = role.name.toLowerCase();
         role.tenantId = ctx.state.user.tenantId;
+        const query = {
+            name: role.name,
+            tenantId: ctx.state.user.tenantId
+        };
+        if (await this.roleRepository.findOne({ where: query })) {
+            throw new BadRequestError(`role '${role.name}' already exists!`);
+        }
         role.claims = [];
         const claims = viewModel.claims || [];
         const claimValues = Object.values(PermissionClaims);
@@ -80,7 +88,7 @@ export class RolesController {
             role.claims.push({
                 claimType: ClaimTypes.permission,
                 claimValue: claim
-            })
+            });
         }
         await this.roleRepository.persist(role);
         return { message: "created user" };

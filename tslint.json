@@ -10,7 +10,10 @@
         "ordered-imports": [
             false
         ],
-        "trailing-comma": [true]
+        "trailing-comma": [
+            true
+        ],
+        "arrow-parens": false
     },
     "rulesDirectory": []
 }

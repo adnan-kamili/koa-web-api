@@ -62,6 +62,10 @@ export class UsersController {
     @HttpCode(201)
     async create( @Ctx() ctx: any, @Body() viewModel: UserViewModel) {
         const user = this.userRepository.create(viewModel);
+        user.email = user.email.toLowerCase();
+        if (await this.userRepository.findOne({ where: { email: user.email } })) {
+            throw new BadRequestError(`email '${viewModel.email}' already exists!`);
+        }
         user.tenantId = ctx.state.user.tenantId;
         user.lastLogin = new Date();
         user.password = await hash(viewModel.password, SALT_ROUNDS);
@@ -82,6 +86,7 @@ export class UsersController {
             user.roles.push(role);
         }
         await this.userRepository.persist(user);
+        ctx.set("Location", `/v1/users/${user.id}`);
         return { message: "user created successfully!" };
     }
 
@@ -176,7 +181,12 @@ export class UsersController {
                 throw new ForbiddenError("you do not have permissions to update the user");
             }
         }
-        user.email = viewModel.email;
+        if (viewModel.email.toLowerCase() !== user.email) {
+            if (await this.userRepository.findOne({ where: { email: viewModel.email.toLowerCase() } })) {
+                throw new BadRequestError(`email '${viewModel.email}' already exists!`);
+            }
+        }
+        user.email = viewModel.email.toLowerCase();
         await this.userRepository.persist(user);
     }
 

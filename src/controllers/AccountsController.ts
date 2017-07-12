@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Ctx, UnauthorizedError } from "routing-controllers";
+import { Controller, Body, Post, Ctx, UnauthorizedError, BadRequestError } from "routing-controllers";
 import { hash } from "bcryptjs";
 import { sign, verify } from "jsonwebtoken";
 import * as config from "config";
@@ -37,6 +37,10 @@ export class AccountsController {
         });
         await this.roleRepository.persist(role);
         const user = this.userRepository.create(viewModel);
+        user.email = user.email.toLowerCase();
+        if (await this.userRepository.findOne({ where: { email: user.email } })) {
+            throw new BadRequestError(`email '${viewModel.email}' already exists!`);
+        }
         user.tenantId = tenant.id;
         user.lastLogin = new Date();
         user.password = await hash(viewModel.password, 10);

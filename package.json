@@ -6,7 +6,6 @@
   "scripts": {
     "test": "mocha --timeout 30000 ./tests/*.test.js",
     "start": "node_modules/.bin/tsc && node ./build/app.js",
-    "start:watch": "npm run build:watch & nodemon ./build/app.js",
     "build": "node_modules/.bin/tsc",
     "build:watch": "npm run build -- -w"
   },
