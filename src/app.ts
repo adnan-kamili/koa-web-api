@@ -6,15 +6,19 @@ import * as config from "config";
 import { createKoaServer, Action, ForbiddenError, useContainer } from "routing-controllers";
 import { CustomErrorHandler } from "./middlewares/CustomErrorHandler";
 import { Repository } from "./repository/Repository";
+import { Logger } from "./services/Logger";
 
 const jwt = require("koa-jwt");
 
 const jwtConfig = config.get<any>("jwt");
+const appConfig = config.get<any>("app");
 
 useContainer(Container);
 
 async function start() {
+    const logger = Container.get(Logger);
     try {
+        logger.info("connecting to database ...");
         const connection = await createConnection({
             type: "mysql",
             host: "localhost",
@@ -27,11 +31,12 @@ async function start() {
             ],
             autoSchemaSync: true,
         });
+        logger.info("connected to database successfully!");
         const repository = Container.get(Repository);
         repository.setConnection(connection);
         const app = createKoaServer({
             defaultErrorHandler: false,
-            routePrefix: "/v1",
+            routePrefix: `/${appConfig.version}`,
             authorizationChecker: async (action: Action, claims: string[]) => {
                 const verifyJwt = jwt(jwtConfig).unless({ path: ["/v1/auth/token", /^\/v1\/accounts/] });
                 await verifyJwt(action.context, () => { });
@@ -50,9 +55,11 @@ async function start() {
             controllers: [__dirname + "/controllers/*.js"],
             middlewares: [CustomErrorHandler]
         });
-        app.listen(3000);
+        logger.info("NODE_ENV:", process.env.NODE_ENV);
+        logger.info(`listening on http://localhost:${appConfig.port}`);
+        app.listen(appConfig.port);
     } catch (error) {
-        console.log(error);
+        logger.error(error);
     }
 
 }

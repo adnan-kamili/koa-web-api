@@ -4,6 +4,7 @@ import { sign, verify } from "jsonwebtoken";
 import * as config from "config";
 
 import { Repository } from "../repository/Repository";
+import { Mailer } from "../services/Mailer";
 import { User } from "../models/User";
 import { Role } from "../models/Role";
 import { Tenant } from "../models/Tenant";
@@ -20,7 +21,7 @@ export class AccountsController {
 
     userRepository: any;
 
-    constructor(private repository: Repository) {
+    constructor(private repository: Repository, private mailer: Mailer) {
         this.userRepository = repository.getRepository(User);
     }
 
@@ -68,9 +69,8 @@ export class AccountsController {
             };
             const token = sign(payload, user.password, { expiresIn: jwtConfig.expiry });
             const url = `http://app.example.com/reset-password?token=${token}`;
-            let message = `<a href="${url}">Click to reset password!</a>`;
-            message = "send";
-            // await Mailer.sendEmail(user.email, "Password reset request", message);
+            const message = `<a href="${url}">Click to reset password!</a>`;
+            await this.mailer.sendEmail(user.email, "Password reset request", message);
         }
     }
 
