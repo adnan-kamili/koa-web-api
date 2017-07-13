@@ -2,7 +2,8 @@
   "name": "koa-web-api",
   "version": "1.0.0",
   "description": "Koa MVC",
-  "main": "app.js",
+  "main": "build/app.js",
+  "bin": "build/app.js",
   "scripts": {
     "test": "mocha --timeout 30000 ./tests/*.test.js",
     "start": "node_modules/.bin/tsc && node ./build/app.js",
@@ -12,24 +13,24 @@
   "keywords": [],
   "author": "Adnan Kamili",
   "license": "ISC",
+  "pkg": {
+    "scripts": "build/**/*.js",
+    "targets": [
+      "node8-win-x64"
+    ]
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "config": "^1.26.1",
-    "joi": "^10.6.0",
     "jsonwebtoken": "^7.4.1",
     "kcors": "^2.2.1",
     "koa": "^2.2.0",
     "koa-bodyparser": "^4.2.0",
-    "koa-convert": "^1.2.0",
     "koa-jwt": "^3.2.2",
-    "koa-logger": "^3.0.0",
-    "koa-mount": "^3.0.0",
     "koa-router": "^7.2.0",
     "mysql": "^2.13.0",
-    "oidc-provider": "^2.0.0-pre.3",
     "reflect-metadata": "^0.1.10",
     "routing-controllers": "^0.7.0",
-    "sequelize": "^3.30.4",
     "typedi": "^0.5.2",
     "typeorm": "^0.1.0-alpha.31",
     "winston": "^2.3.1",
@@ -46,9 +47,7 @@
     "@types/winston": "^2.3.3",
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
-    "eslint": "^3.19.0",
     "mocha": "^3.3.0",
-    "ts-node": "^3.2.0",
     "typescript": "^2.4.1"
   }
 }
