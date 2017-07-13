@@ -29,7 +29,7 @@ async function start() {
             entities: [
                 __dirname + "/models/*.js"
             ],
-            autoSchemaSync: true,
+            autoSchemaSync: true
         });
         logger.info("connected to database successfully!");
         const repository = Container.get(Repository);
