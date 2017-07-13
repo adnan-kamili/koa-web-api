@@ -1,4 +1,4 @@
-import { Entity, Column, Index, ManyToMany, OneToMany, JoinTable } from "typeorm";
+import { Entity, Column, Index, ManyToMany, OneToMany } from "typeorm";
 import { BaseTenantEntity } from "./BaseTenantEntity";
 import { User } from "./User";
 import { RoleClaim } from "./RoleClaim";

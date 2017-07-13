@@ -28,9 +28,9 @@ export class CustomErrorHandler implements KoaMiddlewareInterface {
             }
 
             if (context.status === 500) {
-                //Logger.error(error.message, error);
+                // Logger.error(error.message, error);
             } else {
-                //Logger.info(error.message);
+                // Logger.info(error.message);
             }
         }
 

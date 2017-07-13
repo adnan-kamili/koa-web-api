@@ -1,4 +1,4 @@
-import { MaxLength, IsEmail, Length, IsBase64, IsAscii } from "class-validator";
+import { IsEmail, Length, IsBase64, IsAscii } from "class-validator";
 
 export class PasswordResetViewModel {
     @IsEmail()

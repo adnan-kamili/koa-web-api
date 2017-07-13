@@ -1,4 +1,4 @@
-import { Container, Inject, Service } from "typedi";
+import { Service } from "typedi";
 
 @Service()
 export class Repository {

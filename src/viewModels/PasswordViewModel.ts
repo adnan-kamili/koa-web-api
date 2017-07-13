@@ -1,4 +1,4 @@
-import { MaxLength, IsEmail, MinLength, IsArray, IsAscii} from 'class-validator';
+import { MaxLength, MinLength, IsAscii } from "class-validator";
 
 export class PasswordViewModel {
     @MinLength(6)

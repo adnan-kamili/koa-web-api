@@ -5,7 +5,6 @@ import { PermissionClaims } from "../policies/PermissionClaims";
 import { ClaimTypes } from "../policies/ClaimTypes";
 import { PaginationHeader } from "../middlewares/PaginationHeader";
 import { Repository } from "../repository/Repository";
-import { User } from "../models/User";
 import { Role } from "../models/Role";
 
 const join = { alias: "role", leftJoinAndSelect: { claims: "role.claims" } };
@@ -16,7 +15,7 @@ export class RolesController {
     roleRepository: any;
 
     constructor(private repository: Repository) {
-        this.roleRepository = repository.getRepository(Role);
+        this.roleRepository = this.repository.getRepository(Role);
     }
 
     @Get()

@@ -1,4 +1,4 @@
-import { MaxLength, IsEmail, MinLength, IsArray, IsAscii, IsLowercase, ArrayUnique, IsNotEmpty} from "class-validator";
+import { MaxLength, IsArray, ArrayUnique, IsNotEmpty } from "class-validator";
 
 export class RoleViewModel {
 

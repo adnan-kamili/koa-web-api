@@ -1,6 +1,6 @@
-import { Controller, Body, Post, Ctx, UnauthorizedError } from "routing-controllers";
+import { Controller, Body, Post, UnauthorizedError } from "routing-controllers";
 import { compare } from "bcryptjs";
-import { sign, verify } from "jsonwebtoken";
+import { sign } from "jsonwebtoken";
 import * as config from "config";
 import { Repository } from "../repository/Repository";
 import { User } from "../models/User";
@@ -16,12 +16,12 @@ export class AuthController {
     roleRepository: any;
 
     constructor(private repository: Repository) {
-        this.userRepository = repository.getRepository(User);
-        this.roleRepository = repository.getRepository(Role);
+        this.userRepository = this.repository.getRepository(User);
+        this.roleRepository = this.repository.getRepository(Role);
     }
 
     @Post("/token")
-    async createToken( @Ctx() ctx: any, @Body() viewModel: LoginViewModel) {
+    async createToken( @Body() viewModel: LoginViewModel) {
         const query = { email: viewModel.email };
         const user = await this.userRepository.findOne({
             where: query,

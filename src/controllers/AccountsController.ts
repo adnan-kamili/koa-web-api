@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Put, HttpCode, UnauthorizedError, BadRequestError } from "routing-controllers";
+import { Controller, Body, Post, Put, HttpCode, BadRequestError } from "routing-controllers";
 import { hash } from "bcryptjs";
 import { sign, verify } from "jsonwebtoken";
 import * as config from "config";
@@ -68,8 +68,9 @@ export class AccountsController {
             };
             const token = sign(payload, user.password, { expiresIn: jwtConfig.expiry });
             const url = `http://app.example.com/reset-password?token=${token}`;
-            const message = `<a href="${url}">Click to reset password!</a>`;
-            //await Mailer.sendEmail(user.email, "Password reset request", message);
+            let message = `<a href="${url}">Click to reset password!</a>`;
+            message = "send";
+            // await Mailer.sendEmail(user.email, "Password reset request", message);
         }
     }
 

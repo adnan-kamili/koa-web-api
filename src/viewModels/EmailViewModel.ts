@@ -1,4 +1,4 @@
-import { MaxLength, IsEmail, MinLength, IsArray, IsAscii} from "class-validator";
+import { IsEmail } from "class-validator";
 
 export class EmailViewModel {
 

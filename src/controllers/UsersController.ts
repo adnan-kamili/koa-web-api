@@ -22,8 +22,8 @@ export class UsersController {
     roleRepository: any;
 
     constructor(private repository: Repository) {
-        this.userRepository = repository.getRepository(User);
-        this.roleRepository = repository.getRepository(Role);
+        this.userRepository = this.repository.getRepository(User);
+        this.roleRepository = this.repository.getRepository(Role);
     }
 
     @Get()

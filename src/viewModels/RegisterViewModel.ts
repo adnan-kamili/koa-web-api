@@ -1,7 +1,7 @@
-import { MaxLength, IsEmail, Length, IsArray, IsAscii, IsNotEmpty } from "class-validator";
-import {IsStrict} from "../validators/IsStrict";
+import { MaxLength, IsEmail, Length, IsAscii, IsNotEmpty } from "class-validator";
+// import {IsStrict} from "../validators/IsStrict";
 
-//@IsStrict("1", {})
+// @IsStrict("1", {})
 export class RegisterViewModel {
 
     @IsNotEmpty()
