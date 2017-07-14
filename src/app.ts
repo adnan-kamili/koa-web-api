@@ -14,7 +14,6 @@ const jwtConfig = config.get<any>("jwt");
 const appConfig = config.get<any>("app");
 const dbConfig = config.get<any>("database");
 
-
 useContainer(Container);
 
 async function start() {
@@ -23,11 +22,6 @@ async function start() {
         logger.info("connecting to database ...");
         const connection = await createConnection({
             type: "mysql",
-            // host: "localhost",
-            // port: 3306,
-            // username: "root",
-            // password: "root",
-            // database: "test_db2",
             url: dbConfig.connectionUri,
             entities: [
                 __dirname + "/models/*.js"
