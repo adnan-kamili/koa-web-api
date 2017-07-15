@@ -9,7 +9,7 @@ export class RoleViewModel {
     @MaxLength(256)
     description: string;
 
-    @ArrayUnique()
     @IsArray()
+    @ArrayUnique()
     claims: string[];
 }

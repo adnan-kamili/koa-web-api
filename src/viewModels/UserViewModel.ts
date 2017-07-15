@@ -13,8 +13,8 @@ export class UserViewModel {
     @Length(6, 72)
     password: string;
 
+    @IsArray()
     @ArrayUnique()
     @ArrayMaxSize(10)
-    @IsArray()
     roles: string[];
 }

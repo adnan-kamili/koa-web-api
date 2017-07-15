@@ -20,6 +20,7 @@
     ]
   },
   "dependencies": {
+    "bcrypt": "^1.0.2",
     "bcryptjs": "^2.4.3",
     "config": "^1.26.1",
     "jsonwebtoken": "^7.4.1",
@@ -37,6 +38,7 @@
     "winston-daily-rotate-file": "^1.4.6"
   },
   "devDependencies": {
+    "@types/bcrypt": "^1.0.0",
     "@types/bcryptjs": "^2.4.0",
     "@types/config": "0.0.32",
     "@types/jsonwebtoken": "^7.2.2",
