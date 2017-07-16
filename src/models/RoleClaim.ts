@@ -1,7 +1,6 @@
 import { Entity, Column, ManyToOne } from "typeorm";
-import { BaseEntity } from './BaseEntity';
-import { Role } from './Role';
-
+import { BaseEntity } from "./BaseEntity";
+import { Role } from "./Role";
 
 @Entity()
 export class RoleClaim extends BaseEntity {
@@ -15,7 +14,7 @@ export class RoleClaim extends BaseEntity {
     @ManyToOne(type => Role, role => role.claims, {
         cascadeInsert: true,
         cascadeUpdate: true,
-        cascadeRemove: true
+        onDelete: "CASCADE"
     })
     role: Role;
 }

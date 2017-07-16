@@ -1,5 +1,0 @@
-{
-    "jwt": {
-        "secret": "JWT_SECRET"
-    }
-}

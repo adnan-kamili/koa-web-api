@@ -3,7 +3,7 @@
 process.env.NODE_ENV = 'testing';
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const app = require('../app');
+let { app, start } = require('../build/app');
 const should = chai.should();
 
 chai.use(chaiHttp);
@@ -13,8 +13,8 @@ let resourceUrl = null;
 const keys = ['id', 'name', 'description', 'tenantId', 'claims', 'createdAt', 'updatedAt'];
 
 describe('Roles', () => {
-    before((done) => {
-        setTimeout(() => done(), 10000);
+    before(async () => {
+        await start();
     });
     describe('/POST role', () => {
         it('it should not POST a role without required fields', (done) => {

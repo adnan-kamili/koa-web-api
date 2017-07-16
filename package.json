@@ -5,9 +5,9 @@
   "main": "build/app.js",
   "bin": "build/app.js",
   "scripts": {
-    "test": "mocha --timeout 30000 ./tests/*.test.js",
-    "start": "node_modules/.bin/tsc && node ./build/app.js",
     "build": "node_modules/.bin/tsc",
+    "test": "npm run build && mocha --timeout 30000 ./tests/*.test.js",
+    "start": "npm run build && node ./build/app.js",
     "build:watch": "npm run build -- -w"
   },
   "keywords": [],

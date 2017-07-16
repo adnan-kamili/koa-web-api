@@ -16,7 +16,28 @@ const dbConfig = config.get<any>("database");
 
 useContainer(Container);
 
-async function start() {
+const app = createKoaServer({
+    defaultErrorHandler: false,
+    routePrefix: `/${appConfig.version}`,
+    authorizationChecker: async (action: Action, claims: string[]) => {
+        const verifyJwt = jwt(jwtConfig).unless({ path: ["/v1/auth/token", /^\/v1\/accounts/] });
+        await verifyJwt(action.context, () => { });
+        const user = action.context.state.user;
+        if (user.role.includes("admin")) {
+            return true;
+        }
+        for (const claim of claims) {
+            if (user.scope.includes(claim)) {
+                return true;
+            }
+        }
+
+        throw new ForbiddenError("you do not have required permissions");
+    },
+    controllers: [__dirname + "/controllers/*.js"],
+    middlewares: [CustomErrorHandler]
+});
+export async function start() {
     const logger = Container.get(Logger);
     try {
         logger.info("connecting to database ...");
@@ -31,33 +52,17 @@ async function start() {
         logger.info("connected to database successfully!");
         const repository = Container.get(Repository);
         repository.setConnection(connection);
-        const app = createKoaServer({
-            defaultErrorHandler: false,
-            routePrefix: `/${appConfig.version}`,
-            authorizationChecker: async (action: Action, claims: string[]) => {
-                const verifyJwt = jwt(jwtConfig).unless({ path: ["/v1/auth/token", /^\/v1\/accounts/] });
-                await verifyJwt(action.context, () => { });
-                const user = action.context.state.user;
-                if (user.role.includes("admin")) {
-                    return true;
-                }
-                for (const claim of claims) {
-                    if (user.scope.includes(claim)) {
-                        return true;
-                    }
-                }
-
-                throw new ForbiddenError("you do not have required permissions");
-            },
-            controllers: [__dirname + "/controllers/*.js"],
-            middlewares: [CustomErrorHandler]
-        });
         logger.info("NODE_ENV:", process.env.NODE_ENV);
         logger.info(`listening on http://localhost:${appConfig.port}`);
-        app.listen(appConfig.port);
+        if (process.env.NODE_ENV !== "testing") {
+            app.listen(appConfig.port);
+        }
     } catch (error) {
         logger.error(error);
     }
-
 }
-start();
+if (process.env.NODE_ENV === "testing") {
+    exports.app = app.listen(appConfig.port);
+} else {
+    start();
+}
