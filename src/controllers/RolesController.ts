@@ -88,7 +88,7 @@ export class RolesController {
     @HttpCode(204)
     async update( @Ctx() ctx: any, @Param("id") id: number, @Body(updateBodyOptions) viewModel: RoleViewModel) {
         const query = { id, tenantId: ctx.state.user.tenantId };
-        let role = await this.roleRepository.findOne({ where: query, join });
+        const role = await this.roleRepository.findOne({ where: query, join });
         if (!role) {
             throw new NotFoundError(`role id '${ctx.params.id}' does not exist!`);
         }
@@ -110,12 +110,15 @@ export class RolesController {
             }
         }
         if (viewModel.name && viewModel.name !== role.name) {
-            const roleQuery = { name: role.name, tenantId: ctx.state.user.tenantId };
+            const roleQuery = { name: viewModel.name, tenantId: ctx.state.user.tenantId };
             if (await this.roleRepository.findOne({ where: roleQuery })) {
                 throw new BadRequestError(`role '${role.name}' already exists!`);
             }
+            role.name = viewModel.name;
         }
-        role = { ...role, ...viewModel };
+        if (viewModel.description) {
+            role.description = viewModel.description;
+        }
         await this.roleRepository.persist(role);
     }
 
