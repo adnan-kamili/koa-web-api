@@ -4,11 +4,17 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "identifier": "tsc-build-watch",
             "type": "npm",
             "script": "build:watch",
             "problemMatcher": [
                 "$tsc-watch"
             ]
+        },
+        {
+            "identifier": "tsc-build",
+            "type": "typescript",
+            "tsconfig": "tsconfig.json"
         }
     ]
 }
