@@ -1,18 +1,17 @@
 import { Middleware, KoaMiddlewareInterface } from "routing-controllers";
 import { ValidationError } from "class-validator";
+import { Logger } from "../services/Logger";
 
 @Middleware({ type: "before" })
 export class CustomErrorHandler implements KoaMiddlewareInterface {
 
+    constructor(private logger: Logger) {}
+
     async use(context: any, next: () => Promise<any>): Promise<any> {
         try {
-            console.log("do something before execution...");
             await next();
-            console.log("do something after execution");
         } catch (error) {
-            console.log(error);
             context.status = error.httpCode || error.status || 500;
-            
             if (Array.isArray(error.errors) && error.errors.every((element: ValidationError) => element instanceof ValidationError)) {
                 let errorMessage = null;
                 error.errors.forEach((element: ValidationError) => {
@@ -26,11 +25,11 @@ export class CustomErrorHandler implements KoaMiddlewareInterface {
             } else {
                 context.body = { message: error.message };
             }
-
+            console.log(error);
             if (context.status === 500) {
-                // Logger.error(error.message, error);
+                this.logger.error(error.message, error);
             } else {
-                // Logger.info(error.message);
+                this.logger.error(error.message);
             }
         }
 
