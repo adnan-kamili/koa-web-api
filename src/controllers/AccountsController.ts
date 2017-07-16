@@ -1,10 +1,10 @@
 import { Controller, Body, Post, Put, HttpCode, BadRequestError } from "routing-controllers";
 import { hash } from "bcryptjs";
 import { sign, verify } from "jsonwebtoken";
-import * as config from "config";
 
 import { Repository } from "../repository/Repository";
 import { Mailer } from "../services/Mailer";
+import { AppOptions } from "../options/AppOptions";
 import { User } from "../models/User";
 import { Role } from "../models/Role";
 import { Tenant } from "../models/Tenant";
@@ -13,7 +13,6 @@ import { RegisterViewModel } from "../viewModels/RegisterViewModel";
 import { EmailViewModel } from "../viewModels/EmailViewModel";
 import { PasswordResetViewModel } from "../viewModels/PasswordResetViewModel";
 
-const jwtConfig = config.get<any>("jwt");
 const SALT_ROUNDS = 10;
 
 @Controller("/accounts")
@@ -21,7 +20,7 @@ export class AccountsController {
 
     userRepository: any;
 
-    constructor(private repository: Repository, private mailer: Mailer) {
+    constructor(private repository: Repository, private mailer: Mailer, private appOptions: AppOptions) {
         this.userRepository = repository.getRepository(User);
     }
 
@@ -67,7 +66,7 @@ export class AccountsController {
                 email: user.email,
                 usage: "password_reset_token"
             };
-            const token = sign(payload, user.password, { expiresIn: jwtConfig.expiry });
+            const token = sign(payload, user.password, { expiresIn: this.appOptions.jwt.expiry });
             const url = `http://app.example.com/reset-password?token=${token}`;
             const message = `<a href="${url}">Click to reset password!</a>`;
             await this.mailer.sendEmail(user.email, "Password reset request", message);

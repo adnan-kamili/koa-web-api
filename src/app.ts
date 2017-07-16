@@ -1,26 +1,24 @@
 import "reflect-metadata";
 import { Container } from "typedi";
 import { createConnection } from "typeorm";
-import * as config from "config";
 
 import { createKoaServer, Action, ForbiddenError, useContainer } from "routing-controllers";
 import { CustomErrorHandler } from "./middlewares/CustomErrorHandler";
 import { Repository } from "./repository/Repository";
 import { Logger } from "./services/Logger";
+import { AppOptions } from "./options/AppOptions";
 
 const jwt = require("koa-jwt");
 
-const jwtConfig = config.get<any>("jwt");
-const appConfig = config.get<any>("app");
-const dbConfig = config.get<any>("database");
-
 useContainer(Container);
+const logger = Container.get(Logger);
+const appOptions = Container.get(AppOptions);
 
 const app = createKoaServer({
     defaultErrorHandler: false,
-    routePrefix: `/${appConfig.version}`,
+    routePrefix: `/${appOptions.app.version}`,
     authorizationChecker: async (action: Action, claims: string[]) => {
-        const verifyJwt = jwt(jwtConfig).unless({ path: ["/v1/auth/token", /^\/v1\/accounts/] });
+        const verifyJwt = jwt(appOptions.jwt).unless({ path: ["/v1/auth/token", /^\/v1\/accounts/] });
         await verifyJwt(action.context, () => { });
         const user = action.context.state.user;
         if (user.role.includes("admin")) {
@@ -38,12 +36,11 @@ const app = createKoaServer({
     middlewares: [CustomErrorHandler]
 });
 export async function start() {
-    const logger = Container.get(Logger);
     try {
         logger.info("connecting to database ...");
         const connection = await createConnection({
             type: "mysql",
-            url: dbConfig.connectionUri,
+            url: appOptions.database.connectionUri,
             entities: [
                 __dirname + "/models/*.js"
             ],
@@ -53,16 +50,16 @@ export async function start() {
         const repository = Container.get(Repository);
         repository.setConnection(connection);
         logger.info("NODE_ENV:", process.env.NODE_ENV);
-        logger.info(`listening on http://localhost:${appConfig.port}`);
+        logger.info(`listening on http://localhost:${appOptions.app.port}`);
         if (process.env.NODE_ENV !== "testing") {
-            app.listen(appConfig.port);
+            app.listen(appOptions.app.port);
         }
     } catch (error) {
         logger.error(error);
     }
 }
 if (process.env.NODE_ENV === "testing") {
-    exports.app = app.listen(appConfig.port);
+    exports.app = app.listen(appOptions.app.port);
 } else {
     start();
 }

@@ -14,7 +14,7 @@ const keys = ['id', 'email', 'name', 'lastLogin', 'tenantId', 'roles', 'createdA
 
 describe('Users', () => {
     before(async () => {
-        await start();
+        //await start();
     });
     describe('/POST user', () => {
         it('it should not POST a user without required fields', (done) => {

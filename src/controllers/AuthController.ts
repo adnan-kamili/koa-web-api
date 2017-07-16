@@ -1,13 +1,11 @@
 import { Controller, Body, Post, UnauthorizedError } from "routing-controllers";
 import { compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
-import * as config from "config";
+import { AppOptions } from "../options/AppOptions";
 import { Repository } from "../repository/Repository";
 import { User } from "../models/User";
 import { Role } from "../models/Role";
 import { LoginViewModel } from "../viewModels/LoginViewModel";
-
-const jwtConfig = config.get<any>("jwt");
 
 @Controller("/auth")
 export class AuthController {
@@ -15,7 +13,7 @@ export class AuthController {
     userRepository: any;
     roleRepository: any;
 
-    constructor(private repository: Repository) {
+    constructor(private repository: Repository, private appOptions: AppOptions) {
         this.userRepository = this.repository.getRepository(User);
         this.roleRepository = this.repository.getRepository(Role);
     }
@@ -54,9 +52,9 @@ export class AuthController {
                 payload.scope.push(...claims);
             }
         }
-        const token = sign(payload, jwtConfig.secret, { expiresIn: jwtConfig.expiry });
+        const token = sign(payload, this.appOptions.jwt.secret, { expiresIn: this.appOptions.jwt.expiry });
         user.lastLogin = new Date();
         await this.userRepository.persist(user);
-        return { access_token: token, expires_in: jwtConfig.expiry };
+        return { access_token: token, expires_in: this.appOptions.jwt.expiry };
     }
 }
