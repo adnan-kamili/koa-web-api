@@ -7,14 +7,14 @@ import { Role } from "./Role";
 @Entity()
 export class User extends BaseTenantEntity {
 
-    @Column({ nullable: false })
+    @Column()
     name: string;
 
     @Column({ unique: true })
     email: string;
 
     @Exclude()
-    @Column({ nullable: false })
+    @Column()
     password: string;
 
     @Column()

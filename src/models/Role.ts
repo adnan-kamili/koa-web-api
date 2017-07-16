@@ -7,10 +7,10 @@ import { RoleClaim } from "./RoleClaim";
 @Index(["name", "tenantId"], { unique: true })
 export class Role extends BaseTenantEntity {
 
-    @Column({ nullable: false })
+    @Column()
     name: string;
 
-    @Column({ nullable: false })
+    @Column()
     description: string;
 
     @ManyToMany((type) => User, (user) => user.roles, {

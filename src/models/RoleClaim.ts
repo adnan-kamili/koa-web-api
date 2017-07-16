@@ -5,10 +5,10 @@ import { Role } from "./Role";
 @Entity()
 export class RoleClaim extends BaseEntity {
 
-    @Column({ nullable: false })
+    @Column()
     claimType: string;
 
-    @Column({ nullable: false })
+    @Column()
     claimValue: string;
 
     @ManyToOne(type => Role, role => role.claims, {

@@ -4,6 +4,6 @@ import { BaseEntity } from "./BaseEntity";
 @Entity()
 export class Tenant extends BaseEntity {
 
-    @Column({ nullable: false })
+    @Column()
     company: string;
 }
