@@ -90,6 +90,35 @@ describe('Users', () => {
                 });
         });
     });
+    describe('/PUT/:id/password user', () => {
+        it('it should UPDATE user password given the current password', (done) => {
+            const user = {
+                password: "password1",
+                newPassword: "password2"
+            }
+            chai.request(app).
+                put(resourceUrl+"/password").
+                send(user).
+                end((err, res) => {
+                    res.should.have.status(204);
+                    done();
+                });
+        });
+    });
+    describe('/PUT/:id/password user', () => {
+        it('it should UPDATE user email', (done) => {
+            const user = {
+                email: `test.user+${Date.now()}@gmail.com`
+            }
+            chai.request(app).
+                put(resourceUrl+"/email").
+                send(user).
+                end((err, res) => {
+                    res.should.have.status(204);
+                    done();
+                });
+        });
+    });
     describe('/DELETE/:id user', () => {
         it('it should DELETE a user given the id', (done) => {
             chai.request(app).
