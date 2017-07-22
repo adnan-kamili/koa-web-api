@@ -1,8 +1,7 @@
 import { MaxLength, IsEmail, Length, IsAscii, IsNotEmpty } from "class-validator";
-// import {IsStrict} from "../validators/IsStrict";
+import { BaseViewModel } from "./BaseViewModel";
 
-// @IsStrict("1", {})
-export class RegisterViewModel {
+export class RegisterViewModel extends BaseViewModel {
 
     @IsNotEmpty()
     @MaxLength(256)

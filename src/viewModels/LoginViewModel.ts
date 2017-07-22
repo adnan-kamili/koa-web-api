@@ -1,6 +1,7 @@
 import { IsEmail, IsNotEmpty } from "class-validator";
+import { BaseViewModel } from "./BaseViewModel";
 
-export class LoginViewModel {
+export class LoginViewModel extends BaseViewModel {
 
     @IsEmail()
     email: string;

@@ -1,6 +1,7 @@
 import { MaxLength, IsArray, ArrayUnique, IsNotEmpty } from "class-validator";
+import { BaseViewModel } from "./BaseViewModel";
 
-export class RoleViewModel {
+export class RoleViewModel extends BaseViewModel {
 
     @IsNotEmpty()
     @MaxLength(256)

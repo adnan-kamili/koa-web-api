@@ -1,6 +1,7 @@
 import { IsEmail, Length, IsBase64, IsAscii } from "class-validator";
+import { BaseViewModel } from "./BaseViewModel";
 
-export class PasswordResetViewModel {
+export class PasswordResetViewModel extends BaseViewModel {
     @IsEmail()
     email: string;
 

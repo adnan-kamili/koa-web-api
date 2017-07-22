@@ -1,6 +1,7 @@
-import { MaxLength, IsEmail, Length, IsArray, IsAscii, ArrayUnique, ArrayMaxSize, IsNotEmpty } from 'class-validator';
+import { MaxLength, IsEmail, Length, IsArray, IsAscii, ArrayUnique, ArrayMaxSize, IsNotEmpty } from "class-validator";
+import { BaseViewModel } from "./BaseViewModel";
 
-export class UserViewModel {
+export class UserViewModel extends BaseViewModel {
 
     @IsNotEmpty()
     @MaxLength(256)

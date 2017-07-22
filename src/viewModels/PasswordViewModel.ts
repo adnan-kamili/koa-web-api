@@ -1,6 +1,7 @@
 import { MaxLength, MinLength, IsAscii } from "class-validator";
+import { BaseViewModel } from "./BaseViewModel";
 
-export class PasswordViewModel {
+export class PasswordViewModel extends BaseViewModel {
     @MinLength(6)
     password: string;
 
