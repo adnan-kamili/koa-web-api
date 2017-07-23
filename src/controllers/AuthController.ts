@@ -54,7 +54,7 @@ export class AuthController {
         }
         const token = sign(payload, this.appOptions.jwt.secret, { expiresIn: this.appOptions.jwt.expiry });
         user.lastLogin = new Date();
-        await this.userRepository.persist(user);
+        await this.userRepository.save(user);
         return { access_token: token, expires_in: this.appOptions.jwt.expiry };
     }
 }

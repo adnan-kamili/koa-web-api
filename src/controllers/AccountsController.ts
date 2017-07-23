@@ -35,13 +35,13 @@ export class AccountsController {
 
             const tenant = new Tenant();
             tenant.company = viewModel.company;
-            await tenantRepository.persist(tenant);
+            await tenantRepository.save(tenant);
             const role = roleRepository.create({
                 name: "admin",
                 description: "admin role",
                 tenantId: tenant.id,
             });
-            await roleRepository.persist(role);
+            await roleRepository.save(role);
             const user = userRepository.create(viewModel);
             user.email = user.email.toLowerCase();
             if (await userRepository.findOne({ where: { email: user.email } })) {
@@ -51,7 +51,7 @@ export class AccountsController {
             user.lastLogin = new Date();
             user.password = await hash(viewModel.password, SALT_ROUNDS);
             user.roles = [role];
-            await userRepository.persist(user);
+            await userRepository.save(user);
             return { message: "account created successfully!" };
         });
     }
@@ -90,6 +90,6 @@ export class AccountsController {
             throw new BadRequestError("invalid or expired token!");
         }
         user.password = await hash(viewModel.password, SALT_ROUNDS);
-        await this.userRepository.persist(user);
+        await this.userRepository.save(user);
     }
 }

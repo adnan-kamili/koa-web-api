@@ -85,7 +85,7 @@ export class UsersController {
             }
             user.roles.push(role);
         }
-        await this.userRepository.persist(user);
+        await this.userRepository.save(user);
         ctx.set("Location", `/v1/users/${user.id}`);
         return { message: "user created successfully!" };
     }
@@ -132,7 +132,7 @@ export class UsersController {
         if (viewModel.name) {
             user.name = viewModel.name;
         }
-        await this.userRepository.persist(user);
+        await this.userRepository.save(user);
     }
 
     @Put("/:id/password")
@@ -159,7 +159,7 @@ export class UsersController {
             throw new BadRequestError(`incorrect password!`);
         }
         user.password = await hash(viewModel.newPassword, SALT_ROUNDS);
-        await this.userRepository.persist(user);
+        await this.userRepository.save(user);
     }
 
     @Put("/:id/email")
@@ -187,7 +187,7 @@ export class UsersController {
             }
         }
         user.email = viewModel.email.toLowerCase();
-        await this.userRepository.persist(user);
+        await this.userRepository.save(user);
     }
 
     @Delete("/:id")

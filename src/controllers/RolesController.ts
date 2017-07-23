@@ -78,7 +78,7 @@ export class RolesController {
                 claimValue: claim
             });
         }
-        await this.roleRepository.persist(role);
+        await this.roleRepository.save(role);
         ctx.set("Location", `/v1/roles/${role.id}`);
         return { message: "role created successfully!" };
     }
@@ -119,7 +119,7 @@ export class RolesController {
         if (viewModel.description) {
             role.description = viewModel.description;
         }
-        await this.roleRepository.persist(role);
+        await this.roleRepository.save(role);
     }
 
     @Delete("/:id")
