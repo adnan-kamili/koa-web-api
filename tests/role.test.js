@@ -10,7 +10,7 @@ chai.use(chaiHttp);
 
 const baseUrl = '/v1/roles';
 let resourceUrl = null;
-const keys = ['id', 'name', 'description', 'tenantId', 'claims', 'createdAt', 'updatedAt'];
+const keys = ['id', 'name', 'description', 'claims', 'createdAt', 'updatedAt'];
 
 describe('Roles', () => {
     before(async () => {
