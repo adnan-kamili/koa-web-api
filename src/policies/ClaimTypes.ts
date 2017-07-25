@@ -1,3 +1,3 @@
-export const ClaimTypes = {
-    permission: 'permission'
-};
+export enum ClaimTypes {
+    permission = "permission"
+}
