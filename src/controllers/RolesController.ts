@@ -109,8 +109,8 @@ export class RolesController {
                 });
             }
         }
-        if (viewModel.name && viewModel.name !== role.name) {
-            const roleQuery = { name: viewModel.name, tenantId: ctx.state.user.tenantId };
+        if (viewModel.name && viewModel.name.toLowerCase() !== role.name) {
+            const roleQuery = { name: viewModel.name.toLowerCase(), tenantId: ctx.state.user.tenantId };
             if (await this.roleRepository.findOne({ where: roleQuery })) {
                 throw new BadRequestError(`role '${role.name}' already exists!`);
             }

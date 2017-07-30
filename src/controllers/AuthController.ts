@@ -20,7 +20,7 @@ export class AuthController {
 
     @Post("/token")
     async createToken( @Body() viewModel: LoginViewModel) {
-        const query = { email: viewModel.email.toLowerCase() };
+        const query = { email: viewModel.email };
         const user = await this.userRepository.findOne({
             where: query,
             join: {

@@ -1,4 +1,5 @@
 import { MaxLength, IsEmail, Length, IsArray, IsAscii, ArrayUnique, ArrayMaxSize, IsNotEmpty } from "class-validator";
+import { NormalizeEmail } from "class-sanitizer";
 import { BaseViewModel } from "./BaseViewModel";
 
 export class UserViewModel extends BaseViewModel {
@@ -8,6 +9,7 @@ export class UserViewModel extends BaseViewModel {
     name: string;
 
     @IsEmail()
+    @NormalizeEmail()
     email: string;
 
     @IsAscii()

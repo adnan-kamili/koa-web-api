@@ -35,7 +35,7 @@ describe('Users', () => {
         it('it should POST a user ', (done) => {
             const user = {
                 name: "test user",
-                email: `test.user+${Date.now()}@gmail.com`,
+                email: `test.useR+${Date.now()}@gmail.com`,
                 password: "password1",
                 roles: []
             }

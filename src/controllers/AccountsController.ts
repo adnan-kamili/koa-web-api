@@ -43,7 +43,6 @@ export class AccountsController {
             });
             await roleRepository.save(role);
             const user = userRepository.create(viewModel);
-            user.email = user.email.toLowerCase();
             if (await userRepository.findOne({ where: { email: user.email } })) {
                 throw new BadRequestError(`email already exists!`);
             }

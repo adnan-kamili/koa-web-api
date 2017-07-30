@@ -6,7 +6,7 @@ import { BaseEntity } from "./BaseEntity";
 export class BaseTenantEntity extends BaseEntity {
 
     @Exclude()
-    @Column("int")
+    @Column()
     tenantId: number;
 
 }

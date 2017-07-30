@@ -25,7 +25,6 @@ export class CustomErrorHandler implements KoaMiddlewareInterface {
             } else {
                 context.body = { message: error.message };
             }
-            console.log(error);
             if (context.status === 500) {
                 this.logger.error(error.message, error);
             } else {
