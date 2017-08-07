@@ -52,5 +52,8 @@
     "chai-http": "^3.0.0",
     "mocha": "^3.3.0",
     "typescript": "^2.4.1"
+  },
+  "engines": {
+    "node": ">=8.0.0"
   }
 }
