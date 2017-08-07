@@ -31,6 +31,7 @@
     "koa-jwt": "^3.2.2",
     "koa-router": "^7.2.0",
     "mysql": "^2.13.0",
+    "pg": "^7.1.0",
     "reflect-metadata": "^0.1.10",
     "routing-controllers": "^0.7.0",
     "typedi": "^0.5.2",
