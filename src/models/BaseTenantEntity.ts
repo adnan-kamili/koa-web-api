@@ -1,12 +1,11 @@
-import { AbstractEntity, Column } from "typeorm";
+import { Index, Column } from "typeorm";
 import { Exclude } from "class-transformer";
 import { BaseEntity } from "./BaseEntity";
 
-@AbstractEntity()
+@Index(["id", "tenantId"], { unique: true })
 export class BaseTenantEntity extends BaseEntity {
 
     @Exclude()
     @Column()
     tenantId: number;
-
 }

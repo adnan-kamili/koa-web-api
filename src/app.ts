@@ -39,7 +39,7 @@ export async function start() {
     try {
         logger.info("connecting to database ...");
         const connection = await createConnection({
-            type: "mysql",
+            type: "postgres",
             url: appOptions.database.connectionUri,
             entities: [
                 __dirname + "/models/*.js"
