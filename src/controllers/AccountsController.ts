@@ -1,6 +1,7 @@
 import { Controller, Body, Post, Put, HttpCode, BadRequestError } from "routing-controllers";
 import { hash } from "bcryptjs";
 import { sign, verify } from "jsonwebtoken";
+import { sanitize} from "class-sanitizer";
 
 import { Repository } from "../repository/Repository";
 import { Mailer } from "../services/Mailer";
@@ -27,6 +28,7 @@ export class AccountsController {
     @Post()
     @HttpCode(201)
     async create( @Body() viewModel: RegisterViewModel) {
+        sanitize(viewModel);
         return await this.repository.transaction(async (repository) => {
 
             const userRepository = repository.getRepository(User);
@@ -58,6 +60,7 @@ export class AccountsController {
     @Post("/password-reset-request")
     @HttpCode(202)
     async sendPasswordResetLink( @Body() viewModel: EmailViewModel) {
+        sanitize(viewModel);
         const query = { email: viewModel.email };
         const user = await this.userRepository.findOne({ where: query });
         if (user) {
@@ -75,6 +78,7 @@ export class AccountsController {
     @Put("/password-reset")
     @HttpCode(204)
     async resetPassword( @Body() viewModel: PasswordResetViewModel) {
+        sanitize(viewModel);
         const query = { email: viewModel.email };
         const user = await this.userRepository.findOne({ where: query });
         if (!user) {

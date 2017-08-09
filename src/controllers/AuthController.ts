@@ -1,6 +1,7 @@
 import { Controller, Body, Post, UnauthorizedError } from "routing-controllers";
 import { compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
+import { sanitize} from "class-sanitizer";
 import { AppOptions } from "../options/AppOptions";
 import { Repository } from "../repository/Repository";
 import { User } from "../models/User";
@@ -20,6 +21,7 @@ export class AuthController {
 
     @Post("/token")
     async createToken( @Body() viewModel: LoginViewModel) {
+        sanitize(viewModel);
         const query = { email: viewModel.email };
         const user = await this.userRepository.findOne({
             where: query,
