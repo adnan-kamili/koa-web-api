@@ -4,7 +4,7 @@
         "version": "v1"
     },
     "database": {
-        "connectionUri" : "mysql://root:root@localhost:3306/test_db2"
+        "connectionUri": "postgresql://adnan@localhost/testdb"
     },
     "jwt": {
         "secret": "it is a big secret",

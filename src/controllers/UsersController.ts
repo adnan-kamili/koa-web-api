@@ -1,6 +1,7 @@
 import { Controller, Ctx, Param, Body, QueryParam, Get, Post, Put, Patch, Delete } from "routing-controllers";
 import { NotFoundError, ForbiddenError, BadRequestError } from "routing-controllers";
 import { Authorized, HttpCode, UseAfter } from "routing-controllers";
+import { sanitize} from "class-sanitizer";
 import { hash, compare } from "bcryptjs";
 import { PermissionClaims } from "../policies/PermissionClaims";
 import { PaginationHeader } from "../middlewares/PaginationHeader";
@@ -61,6 +62,7 @@ export class UsersController {
     @Authorized(PermissionClaims.createUser)
     @HttpCode(201)
     async create( @Ctx() ctx: any, @Body() viewModel: UserViewModel) {
+        sanitize(viewModel);
         const user = this.userRepository.create(viewModel);
         if (await this.userRepository.findOne({ where: { email: user.email } })) {
             throw new BadRequestError(`email already exists!`);
@@ -180,6 +182,7 @@ export class UsersController {
                 throw new ForbiddenError("you do not have permissions to update the user");
             }
         }
+        sanitize(viewModel);
         if (viewModel.email !== user.email) {
             if (await this.userRepository.findOne({ where: { email: viewModel.email } })) {
                 throw new BadRequestError(`email already exists!`);

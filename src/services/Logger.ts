@@ -30,6 +30,7 @@ export class Logger {
                 level: this.appOptions.logger.level,
                 datePattern: "yyyy-MM-dd.",
                 prepend: true,
+                maxFiles: 10,
                 // 10 MB max file size then rotate
                 maxsize: 10485760
             })

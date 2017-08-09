@@ -1,10 +1,9 @@
-import { Entity, Column, Index, ManyToMany, OneToMany } from "typeorm";
+import { Entity, Column, ManyToMany, OneToMany } from "typeorm";
 import { BaseTenantEntity } from "./BaseTenantEntity";
 import { User } from "./User";
 import { RoleClaim } from "./RoleClaim";
 
 @Entity()
-@Index(["name", "tenantId"], { unique: true })
 export class Role extends BaseTenantEntity {
 
     @Column()
