@@ -1,4 +1,4 @@
-import { IsEmail, Length, IsBase64, IsAscii } from "class-validator";
+import { IsEmail, Length, IsAscii, IsNotEmpty } from "class-validator";
 import { NormalizeEmail } from "class-sanitizer";
 import { BaseViewModel } from "./BaseViewModel";
 
@@ -12,6 +12,7 @@ export class PasswordResetViewModel extends BaseViewModel {
     @Length(6, 72)
     password: string;
 
-    @IsBase64()
+    @IsNotEmpty()
+    @IsAscii()
     token: string;
 }
