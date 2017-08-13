@@ -1,4 +1,4 @@
-import { Controller, Ctx, Param, Body, QueryParam, Get, Post, Put, Patch, Delete } from "routing-controllers";
+import { Controller, Ctx, Param, Body, QueryParams, Get, Post, Put, Patch, Delete } from "routing-controllers";
 import { NotFoundError, ForbiddenError, BadRequestError } from "routing-controllers";
 import { Authorized, HttpCode, UseAfter } from "routing-controllers";
 import { sanitize} from "class-sanitizer";
@@ -8,6 +8,7 @@ import { PaginationHeader } from "../middlewares/PaginationHeader";
 import { Repository } from "../repository/Repository";
 import { User } from "../models/User";
 import { Role } from "../models/Role";
+import { PaginationViewModel } from "../viewModels/PaginationViewModel";
 
 import { UserViewModel } from "../viewModels/UserViewModel";
 import { EmailViewModel } from "../viewModels/EmailViewModel";
@@ -30,15 +31,12 @@ export class UsersController {
     @Get()
     @Authorized(PermissionClaims.readUser)
     @UseAfter(PaginationHeader)
-    async getAll( @Ctx() ctx: any, @QueryParam("limit") limit = 10, @QueryParam("page") page = 1) {
-        page = (page < 0) ? 1 : page;
-        limit = (limit < 0) ? 0 : limit;
-        limit = (limit > 100) ? 100 : limit;
-        const offset = (page - 1) * limit;
+    async getAll( @Ctx() ctx: any, @QueryParams() pagination: PaginationViewModel) {
+        const { take, skip, page } = pagination;
         const [users, count] = await this.userRepository.findAndCount({
-            where: { tenantId: ctx.state.user.tenantId }, join, limit, offset
+            where: { tenantId: ctx.state.user.tenantId }, join, take, skip
         });
-        ctx.state.pagination = { page, limit, count };
+        ctx.state.pagination = { page, limit: take, count };
         users.map((user: any) => {
             user.roles = user.roles.map((role: any) => role.name);
             return user;

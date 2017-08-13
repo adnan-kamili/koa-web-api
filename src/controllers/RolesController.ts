@@ -1,11 +1,12 @@
 import { Controller, Param, Body, Get, Post, Patch, Delete, ForbiddenError, HttpError } from "routing-controllers";
-import { HttpCode, Authorized, Ctx, QueryParam, UseAfter, BadRequestError, NotFoundError } from "routing-controllers";
+import { HttpCode, Authorized, Ctx, QueryParams, UseAfter, BadRequestError, NotFoundError } from "routing-controllers";
 import { RoleViewModel } from "../viewModels/RoleViewModel";
 import { PermissionClaims } from "../policies/PermissionClaims";
 import { ClaimTypes } from "../policies/ClaimTypes";
 import { PaginationHeader } from "../middlewares/PaginationHeader";
 import { Repository } from "../repository/Repository";
 import { Role } from "../models/Role";
+import { PaginationViewModel } from "../viewModels/PaginationViewModel";
 
 const join = { alias: "role", leftJoinAndSelect: { claims: "role.claims" } };
 const updateBodyOptions = { validate: { skipMissingProperties: true } };
@@ -21,15 +22,12 @@ export class RolesController {
     @Get()
     @Authorized(PermissionClaims.readRole)
     @UseAfter(PaginationHeader)
-    async getAll( @Ctx() ctx: any, @QueryParam("limit") limit = 10, @QueryParam("page") page = 1) {
-        page = (page < 0) ? 1 : page;
-        limit = (limit < 0) ? 0 : limit;
-        limit = (limit > 100) ? 100 : limit;
-        const offset = (page - 1) * limit;
+    async getAll( @Ctx() ctx: any, @QueryParams() pagination: PaginationViewModel) {
+        const { take, skip, page } = pagination;
         const [roles, count] = await this.roleRepository.findAndCount({
-            where: { tenantId: ctx.state.user.tenantId }, join, limit, offset
+            where: { tenantId: ctx.state.user.tenantId }, join, take, skip
         });
-        ctx.state.pagination = { page, limit, count };
+        ctx.state.pagination = { page, limit: take, count };
         roles.map((role: any) => {
             role.claims = role.claims.map((claim: any) => claim.claimValue);
             return role;
