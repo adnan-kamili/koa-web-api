@@ -9,7 +9,12 @@ export class CustomErrorHandler implements KoaMiddlewareInterface {
 
     async use(context: any, next: () => Promise<any>): Promise<any> {
         try {
+            const start = Date.now();
+            // temporary fix for validaion of query params
+            Reflect.setPrototypeOf(context.query, {});
             await next();
+            const ms = Date.now() - start;
+            context.set("Response-Time", `${ms}ms`);
         } catch (error) {
             context.status = error.httpCode || error.status || 500;
             if (Array.isArray(error.errors) && error.errors.every((element: ValidationError) => element instanceof ValidationError)) {
