@@ -1,7 +1,7 @@
 {
     "app": {
         "port": 4000,
-        "version": "v1"
+        "version": "1.0.0"
     },
     "database": {
         "connectionUri": "postgresql://adnan@localhost/testdb"
