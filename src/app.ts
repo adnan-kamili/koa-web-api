@@ -16,7 +16,7 @@ const appOptions = Container.get(AppOptions);
 
 const app = createKoaServer({
     defaultErrorHandler: false,
-    routePrefix: `/${appOptions.app.version}`,
+    routePrefix: "/v1",
     authorizationChecker: async (action: Action, claims: string[]) => {
         const verifyJwt = jwt(appOptions.jwt).unless({ path: ["/v1/auth/token", /^\/v1\/accounts/] });
         await verifyJwt(action.context, () => { });
